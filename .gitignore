@@ -1,0 +1,11 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# local scratch — not part of the published site
+_to_delete/
+files.zip
+index.html.bak
+download-log.txt
+get-images.bat
+get-images.ps1
