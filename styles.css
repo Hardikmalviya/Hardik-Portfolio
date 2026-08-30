@@ -52,13 +52,19 @@
   --gap-quote:       12px;
 
   /* geometry */
-  --hero-h:          830px;
+  --nav-h:           70px;         /* 30px avatar + 2 x --pad-page */
+  --hero-h:          calc(100vh - var(--nav-h));   /* hero fills the rest of the first screen */
+  --hero-min:        600px;        /* floor, so it never crushes on a short window */
   --portrait:        355px;
   --portrait-h:      356px;
   --portrait-shift:  95.43px;      /* top: calc(50% - 95.43px) */
   --r-pill:          40px;
   --r-card:          12px;
   --r-shot:          8px;
+}
+
+@supports (height: 100dvh) {
+  :root { --hero-h: calc(100dvh - var(--nav-h)); }
 }
 
 /* ---------- reset ---------- */
@@ -175,6 +181,7 @@ a {
 .hero {
   position: relative;
   height: var(--hero-h);
+  min-height: var(--hero-min);
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -307,7 +314,6 @@ a {
 /* --- laptop --- */
 @media (max-width: 1180px) {
   :root {
-    --hero-h:         700px;
     --portrait:       300px;
     --portrait-h:     301px;
     --portrait-shift: 80px;

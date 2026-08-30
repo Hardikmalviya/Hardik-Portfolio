@@ -9,3 +9,8 @@ index.html.bak
 download-log.txt
 get-images.bat
 get-images.ps1
+
+# push helper
+push-to-live.bat
+push-log.txt
+.deltest
