@@ -16,7 +16,7 @@
 <body>
 
   <!-- ============ NAV  (13284:12693) ============ -->
-  <header class="nav">
+  <header class="nav" id="top">
     <nav class="nav__left">
       <a class="pill" href="#">Resume</a>
       <a class="pill" href="#">About</a>
@@ -31,10 +31,10 @@
     </nav>
 
     <!-- centre: portrait (Figma 611:246) -->
-    <span class="avatar avatar--center">
+    <a class="avatar avatar--center" href="#top" aria-label="Back to top">
       <!-- images/avatar.png -->
       <img src="images/avatar.png" alt="Hardik" />
-    </span>
+    </a>
 
     <div class="nav__right">
       <!-- images/icon-telegram.png (Figma 611:248) -->
@@ -246,6 +246,25 @@
       window.addEventListener('orientationchange', sync);
       if (window.ResizeObserver) new ResizeObserver(sync).observe(nav);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
+    })();
+
+    // Centre portrait acts as "home" — glides back to the hero.
+    (function () {
+      var home = document.querySelector('.avatar--center');
+      if (!home) return;
+
+      home.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (window.lenis) {
+          window.lenis.scrollTo(0, {
+            duration: 1.6,
+            easing: function (t) { return 1 - Math.pow(1 - t, 4); }
+          });
+        } else {
+          var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+        }
+      });
     })();
 
     // Nav hides on the way down and comes straight back when you scroll up.

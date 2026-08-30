@@ -207,6 +207,10 @@ a {
 /* The centre portrait's fill is cropped lower in the new nav (611:246):
    the image sits at 142.93% height with a -36.19% offset, which works out
    to an object-position of 84%. */
+.avatar--center {
+  border: none;              /* no ring on the centre portrait */
+}
+
 .avatar--center img { object-position: 50% 84%; }
 
 /* =========================================================
