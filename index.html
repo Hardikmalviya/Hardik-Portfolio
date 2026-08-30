@@ -16,7 +16,7 @@
 <body>
 
   <!-- ============ NAV  (13284:12693) ============ -->
-  <header class="nav" id="top">
+  <header class="nav">
     <nav class="nav__left">
       <a class="pill" href="#">Resume</a>
       <a class="pill" href="#">About</a>
@@ -194,11 +194,6 @@
 
   </section>
 
-  <!-- ============ FOOTER ============ -->
-  <footer class="foot">
-    <a class="to-top" href="#top">Back to top</a>
-  </footer>
-
   <!-- ------------------------------------------------------------------
        Smooth scrolling — Lenis 1.3.4, self-hosted in js/ (no CDN).
        lerp 0.05 is the long, floaty glide; raise it toward 0.1 for a
@@ -230,25 +225,23 @@
       window.lenis = lenis;
     })();
 
-    // Back to top. Uses Lenis when it's running, otherwise the browser's own
-    // smooth scroll — and an instant jump if the user asked for reduced motion.
+    // Keep --nav-h matched to the nav's real height. It's 70px on desktop but
+    // wraps to two rows on narrow phones, and the hero sizes itself off this
+    // value, so guessing it would leave a gap or overflow the screen.
     (function () {
-      var link = document.querySelector('.to-top');
-      if (!link) return;
-
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (window.lenis) {
-          window.lenis.scrollTo(0, {
-            duration: 1.6,
-            easing: function (t) { return 1 - Math.pow(1 - t, 4); }
-          });
-        } else {
-          var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-        }
-      });
+      var nav = document.querySelector('header.nav');
+      if (!nav) return;
+      function sync() {
+        var h = Math.round(nav.getBoundingClientRect().height);
+        if (h > 0) document.documentElement.style.setProperty('--nav-h', h + 'px');
+      }
+      sync();
+      window.addEventListener('resize', sync);
+      window.addEventListener('orientationchange', sync);
+      if (window.ResizeObserver) new ResizeObserver(sync).observe(nav);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
     })();
+
   </script>
 
 </body>
