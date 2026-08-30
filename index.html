@@ -194,5 +194,37 @@
 
   </section>
 
+  <!-- ------------------------------------------------------------------
+       Smooth scrolling — Lenis 1.3.4, self-hosted in js/ (no CDN).
+       lerp 0.05 is the long, floaty glide; raise it toward 0.1 for a
+       snappier feel, or delete both script tags to go back to normal.
+       ------------------------------------------------------------------ -->
+  <script src="js/lenis.min.js"></script>
+  <script>
+    (function () {
+      // Respect the OS "reduce motion" setting — leave native scrolling alone.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (typeof Lenis !== 'function') return;
+
+      var lenis = new Lenis({
+        lerp: 0.05,
+        smoothWheel: true,
+        syncTouch: false,      // phones and tablets keep native scrolling
+        wheelMultiplier: 1,
+        touchMultiplier: 1,
+        orientation: 'vertical',
+        gestureOrientation: 'vertical'
+      });
+
+      function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+
+      window.lenis = lenis;
+    })();
+  </script>
+
 </body>
 </html>
