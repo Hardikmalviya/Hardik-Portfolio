@@ -124,7 +124,6 @@ a {
   position: sticky;      /* rides along at the top of the window while you scroll */
   top: 0;
   z-index: 10;           /* sits above the hero portrait and the project cards */
-  background: var(--c-bg);
   display: flex;
   align-items: center;
   justify-content: space-between;
