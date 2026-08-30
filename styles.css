@@ -325,6 +325,36 @@ a {
    once the fixed hero measurements stop fitting.
    ========================================================= */
 
+/* =========================================================
+   FOOTER — not in the Figma file; built from the same tokens
+   ========================================================= */
+.foot {
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--pad-page) calc(var(--pad-page) * 3);
+}
+
+.to-top {
+  font-size: var(--t-label);
+  line-height: var(--lh-flat);
+  letter-spacing: var(--track);
+  color: var(--c-ink-muted);
+  padding: 8px 4px;
+  text-underline-offset: 4px;
+  transition: color 160ms ease;
+}
+
+.to-top:hover {
+  color: var(--c-ink);
+  text-decoration: underline;
+}
+
+.to-top:focus-visible {
+  outline: 1.5px solid var(--c-ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
 /* --- laptop --- */
 @media (max-width: 1180px) {
   :root {
