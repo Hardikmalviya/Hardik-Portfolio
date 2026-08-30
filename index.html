@@ -30,10 +30,16 @@
       </a>
     </nav>
 
+    <!-- centre: portrait (Figma 611:246) -->
+    <span class="avatar avatar--center">
+      <!-- images/avatar.png -->
+      <img src="images/avatar.png" alt="Hardik" />
+    </span>
+
     <div class="nav__right">
+      <!-- images/icon-telegram.png (Figma 611:248) -->
       <span class="avatar">
-        <!-- images/avatar.png -->
-        <img src="images/avatar.png" data-fallback="https://www.figma.com/api/mcp/asset/dd829770-f139-40a9-926c-a7f2a536e29b.png" alt="Hardik" />
+        <img src="images/icon-telegram.png" alt="" />
       </span>
       <a class="pill pill--dark" href="#">Let&rsquo;s connect</a>
     </div>
@@ -240,6 +246,38 @@
       window.addEventListener('orientationchange', sync);
       if (window.ResizeObserver) new ResizeObserver(sync).observe(nav);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
+    })();
+
+    // Nav hides on the way down and comes straight back when you scroll up.
+    // Always visible at the very top of the page.
+    (function () {
+      var nav = document.querySelector('header.nav');
+      if (!nav) return;
+
+      var last = window.scrollY;
+      var ticking = false;
+      var DELTA = 6;   // ignore jitter smaller than this
+
+      function update() {
+        ticking = false;
+        var y = window.scrollY;
+        var navH = nav.getBoundingClientRect().height;
+
+        if (y <= navH) {
+          nav.classList.remove('nav--hidden');
+        } else if (y > last + DELTA) {
+          nav.classList.add('nav--hidden');
+        } else if (y < last - DELTA) {
+          nav.classList.remove('nav--hidden');
+        }
+        last = y;
+      }
+
+      window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+
+      update();
     })();
 
   </script>

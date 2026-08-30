@@ -14,3 +14,5 @@ get-images.ps1
 push-to-live.bat
 push-log.txt
 .deltest
+get-nav-assets.bat
+get-nav-assets.ps1
