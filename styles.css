@@ -383,6 +383,82 @@ a {
 }
 
 /* =========================================================
+   FOOTER
+   Built from the page's own tokens: Inter Tight SemiBold, the .pill
+   component from the nav, --c-hairline for the rule, --pad-page for the
+   gutters. Nothing new invented.
+   ========================================================= */
+.foot {
+  display: flex;
+  flex-direction: column;
+  padding: 120px var(--pad-page) var(--pad-page);
+}
+
+.foot__label {
+  font-size: var(--t-label);
+  line-height: var(--lh-flat);
+  /* uppercase needs a little air; the page's -0.01em would jam it shut */
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-ink-muted);
+}
+
+.foot__statement {
+  margin-top: 28px;
+  font-size: var(--t-heading);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--track);
+  color: var(--c-ink);
+  overflow-wrap: break-word;
+}
+
+.foot__statement a { color: inherit; }
+
+.foot__base {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 200px;
+  padding-top: var(--pad-page);
+  border-top: 1px solid var(--c-hairline);
+}
+
+.foot__copy {
+  font-size: var(--t-label);
+  line-height: var(--lh-flat);
+  letter-spacing: var(--track);
+  color: var(--c-ink-muted);
+  white-space: nowrap;
+}
+
+.foot__cols {
+  display: flex;
+  gap: 80px;
+}
+
+.foot__col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--gap-nav-left);
+}
+
+.foot__col .foot__label { margin-bottom: 12px; }
+
+.foot__col .pill { transition: background-color 160ms ease, color 160ms ease; }
+
+.foot__col .pill:hover {
+  background: var(--c-ink);
+  color: var(--c-bg);
+}
+
+.foot__col .pill:focus-visible {
+  outline: 1.5px solid var(--c-ink);
+  outline-offset: 3px;
+}
+
+/* =========================================================
    RESPONSIVE
    Desktop stays pixel-exact. Everything below only kicks in
    once the fixed hero measurements stop fitting.
@@ -409,6 +485,8 @@ a {
   }
 
   .hero__heading { width: 340px; }
+
+  .foot__cols   { gap: 40px; }
   .quote__text   { width: 250px; }
 
   /* let the text find its own breaks once there isn't room for the set ones */
@@ -451,6 +529,22 @@ a {
     gap: 32px;
     padding-top: 8px;
     padding-bottom: 40px;
+  }
+
+  .foot {
+    padding-top: 80px;
+  }
+
+  .foot__base {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+    margin-top: 100px;
+  }
+
+  .foot__cols {
+    flex-direction: column;
+    gap: 28px;
   }
 
   .hero__field {
