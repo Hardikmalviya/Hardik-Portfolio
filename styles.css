@@ -55,6 +55,7 @@
   --nav-h:           70px;         /* 30px avatar + 2 x --pad-page */
   --hero-h:          calc(100vh - var(--nav-h));   /* hero fills the rest of the first screen */
   --hero-min:        600px;        /* floor, so it never crushes on a short window */
+  --field-h:         340px;        /* hero pixel field */
   --portrait:        355px;
   --portrait-h:      356px;
   --portrait-shift:  95.43px;      /* top: calc(50% - 95.43px) */
@@ -238,23 +239,17 @@ a {
 
 .hero__heading span { color: var(--c-ink-ghost); }
 
-/* absolutely positioned, so it sits outside the space-between flow */
-.hero__portrait {
+/* The pixel field sits where the orb used to: absolutely centred, a little
+   above the middle, outside the heading/quote flow. It never takes clicks. */
+.hero__field {
   position: absolute;
   left: 50%;
   top: calc(50% - var(--portrait-shift));
   transform: translate(-50%, -50%);
-  width: var(--portrait);
-  height: var(--portrait-h);
-  border-radius: 400px;
-  overflow: hidden;
+  width: min(960px, calc(100% - var(--pad-hero) * 2));
+  height: var(--field-h);
   pointer-events: none;
-}
-
-.hero__portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  display: block;
 }
 
 /* All testimonials sit in one grid cell, stacked on top of each other, so the
@@ -396,6 +391,7 @@ a {
 /* --- laptop --- */
 @media (max-width: 1180px) {
   :root {
+    --field-h:        300px;
     --portrait:       300px;
     --portrait-h:     301px;
     --portrait-shift: 80px;
@@ -457,14 +453,12 @@ a {
     padding-bottom: 40px;
   }
 
-  .hero__portrait {
+  .hero__field {
     position: static;
     transform: none;
     order: 1;
-    width: min(72vw, 300px);
-    height: auto;
-    aspect-ratio: 355 / 356;
-    margin: 0 auto;
+    width: 100%;
+    height: 240px;
   }
 
   .hero__heading {
