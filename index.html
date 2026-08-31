@@ -56,9 +56,24 @@
       <img fetchpriority="high" src="images/hero-portrait.png" data-fallback="https://www.figma.com/api/mcp/asset/b0d24215-9d28-4b7d-a5f5-b93dcfe80fee.png" alt="" />
     </figure>
 
+    <!-- Testimonials rotate every 5s. Add or remove .quote__slide blocks freely —
+         the script picks up however many are here. The first one is shown first;
+         every other slide needs class="quote__slide is-idle". -->
     <blockquote class="quote">
-      <p class="quote__text">&ldquo;Hardik has a good design taste, I loved working with him.&rdquo;</p>
-      <cite class="quote__author">@irabukht</cite>
+      <div class="quote__slide">
+        <p class="quote__text">&ldquo;Hardik has a good design taste, I loved working with him.&rdquo;</p>
+        <cite class="quote__author">@irabukht</cite>
+      </div>
+
+      <div class="quote__slide is-idle" aria-hidden="true">
+        <p class="quote__text">&ldquo;PLACEHOLDER — replace with your second client testimonial.&rdquo;</p>
+        <cite class="quote__author">@their-handle</cite>
+      </div>
+
+      <div class="quote__slide is-idle" aria-hidden="true">
+        <p class="quote__text">&ldquo;PLACEHOLDER — replace with your third client testimonial.&rdquo;</p>
+        <cite class="quote__author">@their-handle</cite>
+      </div>
     </blockquote>
   </section>
 
@@ -246,6 +261,53 @@
       window.addEventListener('orientationchange', sync);
       if (window.ResizeObserver) new ResizeObserver(sync).observe(nav);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
+    })();
+
+    // Testimonials: cross-dissolve to the next one every 5 seconds.
+    (function () {
+      var quote  = document.querySelector('.quote');
+      var slides = quote ? Array.prototype.slice.call(quote.querySelectorAll('.quote__slide')) : [];
+      if (slides.length < 2) return;          // nothing to rotate
+
+      var HOLD  = 5000;   // time each testimonial stays up
+      var LEAVE = 290;    // must match .is-leaving's transition-duration
+      var index = 0, timer = null, paused = false;
+
+      function show(next) {
+        var cur = slides[index], nxt = slides[next];
+
+        cur.classList.add('is-leaving');
+        cur.setAttribute('aria-hidden', 'true');
+
+        nxt.classList.remove('is-idle');
+        nxt.setAttribute('aria-hidden', 'false');
+
+        setTimeout(function () {
+          cur.classList.remove('is-leaving');
+          cur.classList.add('is-idle');       // park it below, ready to rise again
+        }, LEAVE);
+
+        index = next;
+      }
+
+      function tick() {
+        if (!paused && !document.hidden) show((index + 1) % slides.length);
+        timer = setTimeout(tick, HOLD);
+      }
+
+      function stop()  { paused = true; }
+      function start() { paused = false; }
+
+      // Pause while someone is reading it, and while the tab is in the background.
+      quote.addEventListener('mouseenter', stop);
+      quote.addEventListener('mouseleave', start);
+      quote.addEventListener('focusin', stop);
+      quote.addEventListener('focusout', start);
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { clearTimeout(timer); } else { clearTimeout(timer); timer = setTimeout(tick, HOLD); }
+      });
+
+      timer = setTimeout(tick, HOLD);
     })();
 
     // Centre portrait acts as "home" — glides back to the hero.

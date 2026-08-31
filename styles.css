@@ -61,6 +61,10 @@
   --r-pill:          40px;
   --r-card:          12px;
   --r-shot:          8px;
+
+  /* motion */
+  --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);   /* things arriving */
+  --ease-in:         cubic-bezier(0.7, 0, 0.84, 0);   /* things leaving */
 }
 
 @supports (height: 100dvh) {
@@ -253,14 +257,47 @@ a {
   object-fit: cover;
 }
 
+/* All testimonials sit in one grid cell, stacked on top of each other, so the
+   block is as tall as the tallest and nothing reflows as they swap. */
 .quote {
+  display: grid;
+  flex-shrink: 0;
+}
+
+.quote__slide {
+  grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
   gap: var(--gap-quote);
   text-align: right;
-  flex-shrink: 0;
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+  /* arriving: longer, ease-out, settles softly */
+  transition: opacity 420ms var(--ease-out),
+              filter  420ms var(--ease-out),
+              transform 420ms var(--ease-out);
+}
+
+/* leaving: shorter and ease-in — they've already read it, don't make them watch */
+.quote__slide.is-leaving {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(-8px);
+  transition-duration: 290ms;
+  transition-timing-function: var(--ease-in);
+  pointer-events: none;
+}
+
+/* parked just below, ready to rise into place */
+.quote__slide.is-idle {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(8px);
+  transition: none;
+  pointer-events: none;
 }
 
 .quote__text {
@@ -421,8 +458,9 @@ a {
     max-width: 420px;
   }
 
-  .quote {
-    order: 3;
+  .quote { order: 3; }
+
+  .quote__slide {
     align-items: flex-start;
     text-align: left;
   }
