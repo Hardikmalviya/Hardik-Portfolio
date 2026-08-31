@@ -476,9 +476,6 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
-  border-radius: var(--r-shot);
-  background: var(--c-bg);
   font-size: var(--t-label);
   line-height: var(--lh-flat);
   letter-spacing: var(--track);
