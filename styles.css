@@ -301,13 +301,17 @@ a {
 }
 
 .quote__text {
-  width: 286.261px;
+  width: 380px;      /* breaks the long testimonial onto three lines */
   font-size: var(--t-quote);
   line-height: var(--lh-tight);
   letter-spacing: var(--track);
   color: var(--c-ink);
   overflow-wrap: break-word;
 }
+
+/* Hovering anywhere on the testimonial darkens the handle — a visible sign
+   that it's interactive and that the rotation has paused. */
+.quote:hover .quote__author { color: var(--c-ink); }
 
 .quote__author a {
   color: inherit;
@@ -328,6 +332,7 @@ a {
 
 .quote__author {
   font-style: normal;
+  transition: color 160ms ease;
   font-size: var(--t-author);
   line-height: var(--lh-flat);
   letter-spacing: var(--track);
@@ -418,7 +423,7 @@ a {
   }
 
   .hero__heading { width: 340px; }
-  .quote__text   { width: 250px; }
+  .quote__text   { width: 300px; }
 }
 
 /* --- mobile --- */
