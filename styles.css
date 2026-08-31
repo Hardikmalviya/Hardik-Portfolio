@@ -401,9 +401,9 @@ a {
 .say {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 120px var(--pad-page) 0;
+  align-items: stretch;
+  gap: 16px;
+  flex: 0 1 520px;
 }
 
 .say__hint {
@@ -411,7 +411,6 @@ a {
   line-height: var(--lh-flat);
   letter-spacing: var(--track);
   color: var(--c-ink-muted);
-  text-align: center;
 }
 
 .say__key {
@@ -423,16 +422,15 @@ a {
   color: var(--c-ink);
 }
 
+/* Plain white and frameless, the way himan.me does it — the field only
+   announces itself through the prompt until you start typing. */
 .say__box {
   position: relative;
-  width: min(620px, 100%);
+  width: 100%;
   border-radius: var(--r-card);
-  background: var(--c-card);
-  transition: background-color 200ms var(--ease-out);
+  background: var(--c-bg);
   cursor: text;
 }
-
-.say__box.is-active { background: var(--c-pill); }
 
 .say__input {
   display: block;
@@ -464,7 +462,8 @@ a {
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding: 0 24px;
   font-size: var(--t-label);
   line-height: var(--lh-flat);
   letter-spacing: var(--track);
@@ -487,6 +486,15 @@ a {
   padding: 80px var(--pad-page) var(--pad-page);
 }
 
+.foot__lead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 64px;
+}
+
+.foot__intro { flex: 1 1 auto; }
+
 .foot__label {
   font-size: var(--t-label);
   line-height: var(--lh-flat);
@@ -505,14 +513,16 @@ a {
   overflow-wrap: break-word;
 }
 
-.foot__statement a {
-  color: var(--c-ink-muted);
+.foot__email {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--c-ink-ghost);          /* same light grey as the hero heading */
   transition: color 160ms ease;
 }
 
-.foot__statement a:hover { color: var(--c-ink); }
+.foot__email:hover { color: var(--c-ink); }
 
-.foot__statement a:focus-visible {
+.foot__email:focus-visible {
   outline: 1.5px solid var(--c-ink);
   outline-offset: 3px;
   border-radius: 2px;
@@ -583,6 +593,14 @@ a {
   }
 
   .hero__heading { width: 340px; }
+
+  /* below this the row gets too tight for both, so they stack */
+  .foot__lead {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .say { flex: 1 1 auto; }
 
 
   .quote__text   { width: 250px; }
@@ -680,9 +698,9 @@ a {
 
   .foot__links { justify-content: flex-start; }
 
-  .say { padding-top: 80px; }
-
   .say__input { min-height: 150px; padding: 18px; }
+
+  .say__prompt { padding: 0 18px; }
 
   .hero__field {
     position: static;
