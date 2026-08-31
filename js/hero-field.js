@@ -25,14 +25,15 @@
   ];
 
   /* ---- tuning ---- */
-  var SPACING     = 9;      // grid pitch, css px
+  var TEXT        = 'Heyyyyy :)';
+  var SPACING     = 6;      // grid pitch, css px
   var DOT         = 3;      // dot size, css px
   var RING        = 78;     // cursor exclusion radius
   var WARMTH      = 210;    // radius over which colour warms
   var SPRING      = 0.085;  // pull back toward home
   var DAMP        = 0.80;   // velocity damping
-  var DRIFT_AMP   = 2.2;    // idle wobble, px
-  var CURRENT     = 0.35;   // slow left→right flow, px/s-ish
+  var DRIFT_AMP   = 1.3;    // idle wobble, px — small, so the word holds
+  var JITTER      = 1.3;    // per-dot offset off the grid, so it isn't a bitmap
 
   var dots = [], W = 0, H = 0, dpr = 1;
   var mouse = { x: -9999, y: -9999, inside: false };
@@ -60,22 +61,57 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     dots.length = 0;
-    var cols = Math.ceil(W / SPACING), rows = Math.ceil(H / SPACING);
+    var mask = textMask(W, H);
+    if (!mask) return;
+
+    // tighter grid on a small canvas, or the strokes come out too thin to read
+    var sp = W < 560 ? 5 : SPACING;
+    var cols = Math.ceil(W / sp), rows = Math.ceil(H / sp);
     for (var r = 0; r < rows; r++) {
       for (var c = 0; c < cols; c++) {
-        var x = c * SPACING + SPACING / 2, y = r * SPACING + SPACING / 2;
-        // density: clumpy noise × soft vertical band × soft horizontal taper
-        var ny = (y / H - 0.5) * 2;                       // -1..1
-        var nx = (x / W - 0.5) * 2;
-        var band  = Math.exp(-ny * ny * 1.7);
-        var taper = 1 - Math.pow(Math.abs(nx), 5);
-        var clump = noise(x * 0.024, y * 0.024) * 0.7 + noise(x * 0.08, y * 0.08) * 0.3;
-        var keep = clump * band * taper;
-        if (keep > 0.2 && hash(c, r) < keep * 1.7) {
-          dots.push({ hx: x, hy: y, x: x, y: y, vx: 0, vy: 0, ph: hash(r, c) * 6.283, k: hash(c * 3, r * 7) });
-        }
+        var gx = c * sp + sp / 2, gy = r * sp + sp / 2;
+        var px = Math.min(W - 1, Math.round(gx)), py = Math.min(H - 1, Math.round(gy));
+        if (mask[(py * W + px) * 4 + 3] < 128) continue;      // outside the letters
+
+        // nudge off the grid so it reads as scattered dust, not a screen door
+        var jx = (hash(c, r) - 0.5) * 2 * JITTER;
+        var jy = (hash(r, c) - 0.5) * 2 * JITTER;
+        var x = gx + jx, y = gy + jy;
+        dots.push({ hx: x, hy: y, x: x, y: y, vx: 0, vy: 0, ph: hash(r, c) * 6.283, k: hash(c * 3, r * 7) });
       }
     }
+  }
+
+  /* Render the word to an offscreen canvas and hand back its alpha channel,
+     so the dots can be placed wherever a glyph is. */
+  function textMask(w, h) {
+    if (!w || !h) return null;
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    var x = c.getContext('2d');
+    if (!x) return null;
+
+    x.fillStyle = '#000';
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+
+    // On a wide box the whole thing fits on one line; on a narrow, tall one
+    // (phones) it stacks, otherwise the type ends up tiny in a big empty field.
+    var lines = (w / h < 1.9) ? ['Heyyyyy', ':)'] : [TEXT];
+
+    var probe = 100;
+    x.font = '700 ' + probe + 'px "Inter Tight", system-ui, sans-serif';
+    var widest = 1;
+    for (var i = 0; i < lines.length; i++) widest = Math.max(widest, x.measureText(lines[i]).width);
+
+    var size = Math.min(probe * (w * 0.9) / widest, (h * 0.78) / lines.length);
+    var lead = size * 1.02;
+
+    x.font = '700 ' + size + 'px "Inter Tight", system-ui, sans-serif';
+    var top = h / 2 - (lines.length - 1) * lead / 2;
+    for (var j = 0; j < lines.length; j++) x.fillText(lines[j], w / 2, top + j * lead);
+
+    return x.getImageData(0, 0, w, h).data;
   }
 
   function colour(t) {
@@ -98,8 +134,8 @@
       var tx = d.hx, ty = d.hy;
       if (!reduceMotion) {
         var flow = noise(d.hx * 0.006 + t * 0.06, d.hy * 0.006) - 0.5;
-        tx += Math.sin(t * 0.7 + d.ph) * DRIFT_AMP + flow * 10 + Math.sin(t * CURRENT + d.k * 6.283) * 3;
-        ty += Math.cos(t * 0.55 + d.ph) * DRIFT_AMP * 0.7 + flow * 6;
+        tx += Math.sin(t * 0.7 + d.ph) * DRIFT_AMP + flow * 3;
+        ty += Math.cos(t * 0.55 + d.ph) * DRIFT_AMP * 0.7 + flow * 2;
       }
 
       // spring toward the drifting target
@@ -170,4 +206,9 @@
 
   build();
   start();
+
+  // The word is sampled from rendered type, so it must be re-sampled once
+  // Inter Tight is actually available — otherwise the fallback's letterforms
+  // are what get frozen into the dots.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
 })();
