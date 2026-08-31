@@ -570,19 +570,51 @@ a {
     right: 0;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--gap-nav-left);
-    padding: 12px var(--pad-page) 16px;
+    gap: 2px;
+    padding: 10px var(--pad-page) 18px;
     background: var(--c-bg);
     border-bottom: 1px solid var(--c-hairline);
     opacity: 0;
-    transform: translateY(-6px);
-    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+    transition: opacity 140ms var(--ease-out);
   }
 
-  .nav__panel.is-open {
-    opacity: 1;
-    transform: translateY(0);
+  .nav__panel.is-open { opacity: 1; }
+
+  /* No fill — the rows are plain text, padded to sit under the Menu label. */
+  .nav__panel .pill {
+    background: none;
+    padding: 9px 12px;
+    transform-origin: top left;
+
+    /* each row starts a touch above and slightly small, then settles */
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+    transition: opacity 300ms var(--ease-out),
+                transform 300ms var(--ease-out),
+                color 160ms ease;
   }
+
+  .nav__panel.is-open .pill {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* 40ms between rows — enough to read as a cascade, short enough that the
+     last one lands before the hand has left the screen */
+  .nav__panel.is-open .pill:nth-child(1) { transition-delay: 30ms; }
+  .nav__panel.is-open .pill:nth-child(2) { transition-delay: 70ms; }
+  .nav__panel.is-open .pill:nth-child(3) { transition-delay: 110ms; }
+  .nav__panel.is-open .pill:nth-child(4) { transition-delay: 150ms; }
+  .nav__panel.is-open .pill:nth-child(5) { transition-delay: 190ms; }
+
+  /* Closing: no stagger and quicker — the decision is already made. */
+  .nav__panel:not(.is-open) .pill {
+    transition: opacity 150ms var(--ease-in), transform 150ms var(--ease-in);
+    transition-delay: 0ms;
+  }
+
+  .nav__panel .pill:hover,
+  .nav__panel .pill:active { color: var(--c-ink); }
 
   .nav__panel .pill:focus-visible,
   .nav__menu:focus-visible {

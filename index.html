@@ -369,7 +369,7 @@
       var panel = document.getElementById('nav-menu');
       if (!nav || !btn || !panel) return;
 
-      var CLOSE_MS = 220, hideTimer = null;
+      var CLOSE_MS = 200, hideTimer = null;   // covers the 150ms exit
 
       function isOpen() { return btn.getAttribute('aria-expanded') === 'true'; }
 
