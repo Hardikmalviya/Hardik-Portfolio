@@ -396,7 +396,9 @@ a {
 }
 
 /* =========================================================
-   MESSAGE — a note box that hands off to the visitor's mail client
+   MESSAGE — modelled on himan.me: the field rests dimmed and lifts to
+   full strength on hover or focus. Their type is a handwriting face and
+   theirs sits on white; this keeps Inter Tight and the page's own greys.
    ========================================================= */
 .say {
   display: flex;
@@ -411,7 +413,6 @@ a {
   line-height: var(--lh-flat);
   letter-spacing: var(--track);
   color: var(--c-ink-muted);
-  text-align: right;
 }
 
 .say__key {
@@ -425,18 +426,26 @@ a {
   width: 100%;
   border-radius: var(--r-card);
   background: var(--c-card);
+  overflow: hidden;
   cursor: text;
+  opacity: 0.7;                                  /* himan.me's resting state */
+  transition: opacity 200ms var(--ease-out);
 }
+
+.say__box:hover,
+.say__box:focus-within,
+.say__box.is-active { opacity: 1; }
 
 .say__input {
   display: block;
   width: 100%;
-  min-height: 190px;
-  padding: 24px;
+  min-height: 160px;
+  padding: 20px;
   border: 0;
   border-radius: inherit;
   background: transparent;
   resize: none;
+  overflow: hidden;
   font-family: inherit;
   font-weight: var(--weight);
   font-size: var(--t-quote);
@@ -452,7 +461,6 @@ a {
   outline-offset: 3px;
 }
 
-/* the resting label, sitting over the empty field */
 .say__prompt {
   position: absolute;
   inset: 0;
@@ -464,7 +472,6 @@ a {
   transition: opacity 200ms var(--ease-out);
 }
 
-/* white chip so the invitation reads clearly against the grey field */
 .say__chip {
   display: inline-flex;
   align-items: center;
@@ -487,6 +494,19 @@ a {
 }
 
 .say__box.is-active .say__prompt { opacity: 0; }
+
+/* sending / sent / failed */
+.say__status {
+  min-height: 1em;
+  font-size: var(--t-label);
+  line-height: var(--lh-flat);
+  letter-spacing: var(--track);
+  color: var(--c-ink-muted);
+  transition: color 160ms ease;
+}
+
+.say__status.is-ok  { color: var(--c-ink); }
+.say__status.is-bad { color: var(--c-ink); }
 
 /* =========================================================
    FOOTER
