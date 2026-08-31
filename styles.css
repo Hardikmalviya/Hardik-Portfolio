@@ -135,7 +135,8 @@ a {
   padding: var(--pad-page);
   overflow: hidden;
   /* 300ms ease-out — the same curve bricxlabs uses on its header */
-  transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+  transition: transform 300ms cubic-bezier(0, 0, 0.2, 1),
+              background-color 160ms var(--ease-out);
 }
 
 /* Slid up out of view while you're scrolling down. */
@@ -579,6 +580,11 @@ a {
   }
 
   .nav__panel.is-open { opacity: 1; }
+
+  /* The bar is transparent by design, which left project artwork showing
+     through it while the panel below was solid white. Opening the menu
+     makes the bar opaque so the two form one surface. */
+  .nav--menu-open { background: var(--c-bg); }
 
   /* No fill — the rows are plain text, padded to sit under the Menu label. */
   .nav__panel .pill {
