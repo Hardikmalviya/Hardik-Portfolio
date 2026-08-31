@@ -228,31 +228,13 @@
     <div class="foot__lead">
       <div class="foot__intro">
         <p class="foot__label">Contact</p>
-        <p class="foot__statement">
-          <a class="foot__email" href="mailto:hardikmalviy@gmail.com">hardikmalviy@gmail.com</a>
-          <span class="foot__line">Thanks for looking through my work. <br />A project, some feedback, or just a hello &mdash; <br />send it over and I&rsquo;ll get back to you.</span>
-        </p>
+        <a class="foot__email" href="mailto:hardikmalviy@gmail.com">hardikmalviy@gmail.com</a>
       </div>
 
-      <!-- Message box, after himan.me: dimmed at rest, lifts on hover,
-           sends without opening a mail client. -->
-      <div class="say">
-        <p class="say__hint">start typing your message here; press <kbd class="say__key">&#8984;</kbd> + <kbd class="say__key">enter</kbd> to send.</p>
-
-        <div class="say__box">
-          <textarea class="say__input" rows="4" aria-label="Your message"></textarea>
-          <p class="say__prompt" aria-hidden="true">
-            <span class="say__chip">
-              <svg class="say__cursor" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true" focusable="false">
-                <path d="M4 2 L4 16.6 L7.9 12.8 L10.3 18 L12.6 16.9 L10.2 11.9 L15.2 11.9 Z" fill="currentColor" />
-              </svg>
-              Click here or press any key to focus
-            </span>
-          </p>
-        </div>
-
-        <p class="say__status" role="status" aria-live="polite"></p>
-      </div>
+      <p class="foot__statement">
+        <span class="foot__line">Thanks for looking through my work. <br />A project, some feedback, or just a hello &mdash; <br />send it over and I&rsquo;ll get back to you :)</span>
+      </p>
+    </div>
       </div>
     </div>
 
@@ -378,109 +360,6 @@
       }
 
       Array.prototype.forEach.call(homes, function (el) { el.addEventListener('click', goHome); });
-    })();
-
-    // Message box, modelled on himan.me.
-    //
-    // HOW SENDING WORKS
-    // himan.me POSTs to its own /api/messages route, which it can do because
-    // it runs on Vercel with a server behind it. GitHub Pages serves static
-    // files only — there is no server here to receive a POST. So this posts
-    // to Web3Forms, a free relay that takes the message and emails it on.
-    //
-    // TO TURN IT ON: get a free access key at https://web3forms.com (enter
-    // your email, they send you a key), then paste it below. Until then the
-    // box falls back to opening the visitor's mail client.
-    (function () {
-      var ACCESS_KEY = 'PASTE-YOUR-WEB3FORMS-KEY-HERE';
-      var EMAIL      = 'hardikmalviy@gmail.com';
-      var SUBJECT    = 'Hello from your portfolio';
-
-      var box    = document.querySelector('.say__box');
-      var input  = document.querySelector('.say__input');
-      var status = document.querySelector('.say__status');
-      var key    = document.querySelectorAll('.say__key')[0];
-      if (!box || !input) return;
-
-      var isMac = /Mac|iP(hone|ad|od)/.test(navigator.platform || navigator.userAgent);
-      if (key && !isMac) key.textContent = 'ctrl';
-
-      var sending = false, resetTimer = null;
-
-      function say(msg, kind) {
-        status.textContent = msg || '';
-        status.className = 'say__status' + (kind ? ' is-' + kind : '');
-      }
-
-      function focusInput() { input.focus({ preventScroll: true }); }
-
-      box.addEventListener('click', focusInput);
-      input.addEventListener('focus', function () { box.classList.add('is-active'); });
-      input.addEventListener('blur',  function () { if (!input.value) box.classList.remove('is-active'); });
-      input.addEventListener('input', function () {
-        if (input.value) box.classList.add('is-active');
-        input.style.height = 'auto';
-        input.style.height = input.scrollHeight + 'px';   // grow with the text
-      });
-
-      // Any ordinary keypress while the box is on screen jumps you into it.
-      var onScreen = false;
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; }, { threshold: 0.4 }).observe(box);
-      }
-      document.addEventListener('keydown', function (e) {
-        if (!onScreen || sending || e.metaKey || e.ctrlKey || e.altKey) return;
-        var t = e.target;
-        if (t === input || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) return;
-        if (e.key.length !== 1) return;
-        focusInput();
-      });
-
-      function mailtoFallback(body) {
-        window.location.href = 'mailto:' + EMAIL +
-          '?subject=' + encodeURIComponent(SUBJECT) +
-          '&body=' + encodeURIComponent(body);
-      }
-
-      function send() {
-        var body = input.value.trim();
-        if (!body || sending) { focusInput(); return; }
-
-        if (ACCESS_KEY.indexOf('PASTE-') === 0) { mailtoFallback(body); return; }
-
-        sending = true;
-        say('sending your message...', 'busy');
-
-        fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ access_key: ACCESS_KEY, subject: SUBJECT, message: body, from_name: 'colehardik.in' })
-        })
-        .then(function (r) { return r.json().catch(function () { return null; }); })
-        .then(function (data) {
-          sending = false;
-          if (data && data.success) {
-            say('thanks for your message, type to send another :)', 'ok');
-            input.value = '';
-            input.style.height = 'auto';
-            box.classList.remove('is-active');
-            clearTimeout(resetTimer);
-            resetTimer = setTimeout(function () { say(''); }, 4000);
-          } else {
-            say('failed to send. try again :/', 'bad');
-            focusInput();
-          }
-        })
-        .catch(function () {
-          sending = false;
-          say('failed to send. try again :/', 'bad');
-          focusInput();
-        });
-      }
-
-      input.addEventListener('keydown', function (e) {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); send(); }
-      });
     })();
 
     // Mobile drop-down menu.
