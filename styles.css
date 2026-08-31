@@ -505,7 +505,18 @@ a {
   overflow-wrap: break-word;
 }
 
-.foot__statement a { color: inherit; }
+.foot__statement a {
+  color: var(--c-ink-muted);
+  transition: color 160ms ease;
+}
+
+.foot__statement a:hover { color: var(--c-ink); }
+
+.foot__statement a:focus-visible {
+  outline: 1.5px solid var(--c-ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
 
 .foot__base {
   display: flex;
@@ -577,7 +588,8 @@ a {
   .quote__text   { width: 250px; }
 
   /* let the text find its own breaks once there isn't room for the set ones */
-  .quote__text br { display: none; }
+  .quote__text br,
+  .foot__line br { display: none; }
 }
 
 /* --- mobile --- */
