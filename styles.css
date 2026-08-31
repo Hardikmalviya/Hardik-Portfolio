@@ -404,12 +404,13 @@ a {
 .foot {
   display: flex;
   flex-direction: column;
-  padding: 80px var(--pad-page) var(--pad-page);
+  padding: 150px var(--pad-page) var(--pad-page);
 }
 
 .foot__lead {
   display: flex;
-  align-items: flex-start;
+  /* the email's baseline lines up with the last line of the statement */
+  align-items: flex-end;
   justify-content: space-between;
   gap: 64px;
 }
@@ -459,7 +460,7 @@ a {
   justify-content: space-between;
   gap: 24px;
   align-items: center;
-  margin-top: 72px;
+  margin-top: 130px;
   padding-top: var(--pad-page);
   border-top: 1px solid var(--c-hairline);
 }
@@ -511,6 +512,7 @@ a {
      stack rather than squeezing it into four lines */
   .foot__lead {
     flex-direction: column;
+    align-items: flex-start;
     gap: 32px;
   }
 }
@@ -611,14 +613,14 @@ a {
   }
 
   .foot {
-    padding-top: 80px;
+    padding-top: 100px;
   }
 
   .foot__base {
     flex-direction: column;
     align-items: stretch;
     gap: 24px;
-    margin-top: 56px;
+    margin-top: 80px;
   }
 
   .foot__links { justify-content: flex-start; }
