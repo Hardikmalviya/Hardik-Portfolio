@@ -259,6 +259,15 @@
        snappier feel, or delete both script tags to go back to normal.
        ------------------------------------------------------------------ -->
   <script src="js/hero-visor.js" defer></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./js/vendor/three/three.module.min.js",
+      "three/addons/": "./js/vendor/three/addons/"
+    }
+  }
+  </script>
+  <script type="module" src="js/hero-3d.js"></script>
   <script src="js/lenis.min.js"></script>
   <script>
     (function () {

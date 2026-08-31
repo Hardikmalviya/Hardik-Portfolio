@@ -82,8 +82,17 @@
     raf = requestAnimationFrame(frame);
   }
 
-  function start() { if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); } }
+  function start() { if (!running && !retired) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); } }
   function stop()  { if (running)  { running = false; cancelAnimationFrame(raf); } }
+
+  /* Once the real-3D scene (hero-3d.js) has rendered its first frame it
+     owns the visor, so this flat version bows out for good. */
+  var retired = false;
+  window.addEventListener('heroVisor3DReady', function () {
+    retired = true;
+    stop();
+    if (shadow) { shadow.style.transform = ''; shadow.style.opacity = ''; }
+  }, { once: true });
 
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (e) { e[0].isIntersecting ? start() : stop(); }, { threshold: 0.05 }).observe(wrap);
