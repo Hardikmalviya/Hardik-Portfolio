@@ -162,10 +162,19 @@ a {
 
 .nav__menu {
   border: 0;
+  gap: 6px;
   font-family: inherit;
   font-weight: var(--weight);
   cursor: pointer;
 }
+
+.nav__chev {
+  display: block;
+  flex-shrink: 0;
+  transition: transform 260ms var(--ease-out);
+}
+
+.nav__menu[aria-expanded="true"] .nav__chev { transform: rotate(180deg); }
 
 .nav__right {
   display: flex;
@@ -563,41 +572,30 @@ a {
   .on-wide     { display: none; }
   .on-narrow   { display: inline; }
 
+  /* Transparent panel — the pills carry their own fill, so they stay
+     readable over whatever artwork is behind them. */
   .nav__panel {
     display: flex;
     position: absolute;
     top: 100%;
     left: 0;
-    right: 0;
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
-    padding: 10px var(--pad-page) 18px;
-    background: var(--c-bg);
-    border-bottom: 1px solid var(--c-hairline);
-    opacity: 0;
-    transition: opacity 140ms var(--ease-out);
+    gap: 12px;
+    padding: 14px var(--pad-page) 0;
+    background: none;
   }
 
-  .nav__panel.is-open { opacity: 1; }
-
-  /* The bar is transparent by design, which left project artwork showing
-     through it while the panel below was solid white. Opening the menu
-     makes the bar opaque so the two form one surface. */
-  .nav--menu-open { background: var(--c-bg); }
-
-  /* No fill — the rows are plain text, padded to sit under the Menu label. */
   .nav__panel .pill {
-    background: none;
-    padding: 9px 12px;
     transform-origin: top left;
 
-    /* each row starts a touch above and slightly small, then settles */
+    /* each pill arrives from up and slightly left — the direction of the
+       Menu button it came from */
     opacity: 0;
-    transform: translateY(-10px) scale(0.96);
+    transform: translate(-6px, -10px) scale(0.96);
     transition: opacity 300ms var(--ease-out),
                 transform 300ms var(--ease-out),
-                color 160ms ease;
+                background-color 160ms ease;
   }
 
   .nav__panel.is-open .pill {
@@ -618,9 +616,6 @@ a {
     transition: opacity 150ms var(--ease-in), transform 150ms var(--ease-in);
     transition-delay: 0ms;
   }
-
-  .nav__panel .pill:hover,
-  .nav__panel .pill:active { color: var(--c-ink); }
 
   .nav__panel .pill:focus-visible,
   .nav__menu:focus-visible {
