@@ -309,6 +309,23 @@ a {
   overflow-wrap: break-word;
 }
 
+.quote__author a {
+  color: inherit;
+  text-underline-offset: 3px;
+  transition: color 160ms ease;
+}
+
+.quote__author a:hover {
+  color: var(--c-ink);
+  text-decoration: underline;
+}
+
+.quote__author a:focus-visible {
+  outline: 1.5px solid var(--c-ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 .quote__author {
   font-style: normal;
   font-size: var(--t-author);
