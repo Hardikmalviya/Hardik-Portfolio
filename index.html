@@ -61,9 +61,12 @@
       I create clean, magnetic design <span>that makes products feel effortless to use.</span>
     </p>
 
-    <!-- Interactive pixel field (js/hero-field.js). Decorative, so hidden
-         from assistive tech; it never intercepts clicks. -->
-    <canvas class="hero__field" aria-hidden="true"></canvas>
+    <!-- Vision Pro that follows the cursor (js/hero-visor.js). Decorative,
+         never intercepts clicks. -->
+    <div class="hero__visor" aria-hidden="true">
+      <span class="hero__visor-shadow"></span>
+      <img class="hero__visor-img" src="images/visionpro.webp" alt="" draggable="false" fetchpriority="high" />
+    </div>
 
     <!-- Testimonials swap every 5s: the current one leaves, then the next
          arrives — they never overlap. Add or remove .quote__slide blocks
@@ -255,7 +258,7 @@
        lerp 0.05 is the long, floaty glide; raise it toward 0.1 for a
        snappier feel, or delete both script tags to go back to normal.
        ------------------------------------------------------------------ -->
-  <script src="js/hero-field.js" defer></script>
+  <script src="js/hero-visor.js" defer></script>
   <script src="js/lenis.min.js"></script>
   <script>
     (function () {
