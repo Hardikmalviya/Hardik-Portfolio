@@ -396,6 +396,86 @@ a {
 }
 
 /* =========================================================
+   MESSAGE — a note box that hands off to the visitor's mail client
+   ========================================================= */
+.say {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 120px var(--pad-page) 0;
+}
+
+.say__hint {
+  font-size: var(--t-label);
+  line-height: var(--lh-flat);
+  letter-spacing: var(--track);
+  color: var(--c-ink-muted);
+  text-align: center;
+}
+
+.say__key {
+  font-family: inherit;
+  font-size: inherit;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--c-pill);
+  color: var(--c-ink);
+}
+
+.say__box {
+  position: relative;
+  width: min(620px, 100%);
+  border-radius: var(--r-card);
+  background: var(--c-card);
+  transition: background-color 200ms var(--ease-out);
+  cursor: text;
+}
+
+.say__box.is-active { background: var(--c-pill); }
+
+.say__input {
+  display: block;
+  width: 100%;
+  min-height: 190px;
+  padding: 24px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  resize: none;
+  font-family: inherit;
+  font-weight: var(--weight);
+  font-size: var(--t-quote);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--track);
+  color: var(--c-ink);
+}
+
+.say__input:focus { outline: none; }
+
+.say__box:focus-within {
+  outline: 1.5px solid var(--c-ink);
+  outline-offset: 3px;
+}
+
+/* the resting label, sitting over the empty field */
+.say__prompt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--t-label);
+  line-height: var(--lh-flat);
+  letter-spacing: var(--track);
+  color: var(--c-ink-muted);
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.say__box.is-active .say__prompt { opacity: 0; }
+
+/* =========================================================
    FOOTER
    Built from the page's own tokens: Inter Tight SemiBold, the .pill
    component from the nav, --c-hairline for the rule, --pad-page for the
@@ -404,7 +484,7 @@ a {
 .foot {
   display: flex;
   flex-direction: column;
-  padding: 120px var(--pad-page) var(--pad-page);
+  padding: 80px var(--pad-page) var(--pad-page);
 }
 
 .foot__label {
@@ -431,8 +511,9 @@ a {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 40px;
-  margin-top: 200px;
+  gap: 24px;
+  align-items: center;
+  margin-top: 72px;
   padding-top: var(--pad-page);
   border-top: 1px solid var(--c-hairline);
 }
@@ -445,28 +526,21 @@ a {
   white-space: nowrap;
 }
 
-.foot__cols {
+.foot__links {
   display: flex;
-  gap: 80px;
-}
-
-.foot__col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--gap-nav-left);
 }
 
-.foot__col .foot__label { margin-bottom: 12px; }
+.foot__links .pill { transition: background-color 160ms ease, color 160ms ease; }
 
-.foot__col .pill { transition: background-color 160ms ease, color 160ms ease; }
-
-.foot__col .pill:hover {
+.foot__links .pill:hover {
   background: var(--c-ink);
   color: var(--c-bg);
 }
 
-.foot__col .pill:focus-visible {
+.foot__links .pill:focus-visible {
   outline: 1.5px solid var(--c-ink);
   outline-offset: 3px;
 }
@@ -499,7 +573,7 @@ a {
 
   .hero__heading { width: 340px; }
 
-  .foot__cols   { gap: 40px; }
+
   .quote__text   { width: 250px; }
 
   /* let the text find its own breaks once there isn't room for the set ones */
@@ -588,14 +662,15 @@ a {
   .foot__base {
     flex-direction: column;
     align-items: stretch;
-    gap: 32px;
-    margin-top: 100px;
+    gap: 24px;
+    margin-top: 56px;
   }
 
-  .foot__cols {
-    flex-direction: column;
-    gap: 28px;
-  }
+  .foot__links { justify-content: flex-start; }
+
+  .say { padding-top: 80px; }
+
+  .say__input { min-height: 150px; padding: 18px; }
 
   .hero__field {
     position: static;

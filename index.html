@@ -223,32 +223,36 @@
 
   </section>
 
+  <!-- ============ MESSAGE ============ -->
+  <section class="say">
+    <p class="say__hint">
+      Start typing your message here; press <kbd class="say__key">&#8984;</kbd> + <kbd class="say__key">Enter</kbd> to send.
+    </p>
+
+    <div class="say__box">
+      <textarea class="say__input" rows="4" aria-label="Your message"></textarea>
+      <p class="say__prompt" aria-hidden="true">Click here or press any key to focus</p>
+    </div>
+  </section>
+
   <!-- ============ FOOTER ============ -->
   <footer class="foot">
     <div class="foot__lead">
       <p class="foot__label">Contact</p>
       <p class="foot__statement">
         <a href="mailto:hardikmalviy@gmail.com">hardikmalviy@gmail.com</a><br />
-        <span class="foot__line">STATEMENT LINE &mdash; replace with your own sentence.</span>
+        <span class="foot__line">Thanks for looking through my work. A project, some feedback, or just a hello &mdash; send it over and I&rsquo;ll get back to you.</span>
       </p>
     </div>
 
     <div class="foot__base">
       <p class="foot__copy">&copy;2026 Hardik Malviya</p>
 
-      <div class="foot__cols">
-        <div class="foot__col">
-          <p class="foot__label">Follow</p>
-          <a class="pill" href="https://x.com/coleHardik" target="_blank" rel="noopener noreferrer">X</a>
-          <a class="pill" href="https://www.linkedin.com/in/hardik-malviya-3b27bb329/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-          <a class="pill" href="https://t.me/colehardik" target="_blank" rel="noopener noreferrer">Telegram</a>
-        </div>
-
-        <div class="foot__col">
-          <p class="foot__label">Contact</p>
-          <a class="pill" href="mailto:hardikmalviy@gmail.com">hardikmalviy@gmail.com</a>
-          <a class="pill" href="https://cal.com/cole-hardik-design/discovery-call" target="_blank" rel="noopener noreferrer">Book a call</a>
-        </div>
+      <div class="foot__links">
+        <a class="pill" href="https://x.com/coleHardik" target="_blank" rel="noopener noreferrer">X</a>
+        <a class="pill" href="https://www.linkedin.com/in/hardik-malviya-3b27bb329/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a class="pill" href="https://t.me/colehardik" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <a class="pill" href="https://cal.com/cole-hardik-design/discovery-call" target="_blank" rel="noopener noreferrer">Book a call</a>
       </div>
     </div>
   </footer>
@@ -363,6 +367,54 @@
       }
 
       Array.prototype.forEach.call(homes, function (el) { el.addEventListener('click', goHome); });
+    })();
+
+    // "Say something" box. The site is static, so there's no server to post
+    // to — Cmd/Ctrl+Enter hands the text to the visitor's own mail client.
+    (function () {
+      var box    = document.querySelector('.say__box');
+      var input  = document.querySelector('.say__input');
+      var prompt = document.querySelector('.say__prompt');
+      var key    = document.querySelector('.say__key');
+      if (!box || !input) return;
+
+      var TO      = 'hardikmalviy@gmail.com';
+      var SUBJECT = 'Hello from your portfolio';
+      var isMac   = /Mac|iP(hone|ad|od)/.test(navigator.platform || navigator.userAgent);
+
+      if (key && !isMac) key.textContent = 'Ctrl';
+
+      function focusInput() { input.focus(); }
+
+      box.addEventListener('click', focusInput);
+      input.addEventListener('focus', function () { box.classList.add('is-active'); });
+      input.addEventListener('blur',  function () { if (!input.value) box.classList.remove('is-active'); });
+      input.addEventListener('input', function () { if (input.value) box.classList.add('is-active'); });
+
+      // Any ordinary keypress while the box is on screen jumps you into it.
+      var onScreen = false;
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; }, { threshold: 0.4 }).observe(box);
+      }
+      document.addEventListener('keydown', function (e) {
+        if (!onScreen || e.metaKey || e.ctrlKey || e.altKey) return;
+        var t = e.target;
+        if (t === input || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) return;
+        if (e.key.length !== 1) return;                 // ignore Tab, arrows, Escape…
+        focusInput();
+      });
+
+      function send() {
+        var body = input.value.trim();
+        if (!body) { focusInput(); return; }
+        window.location.href = 'mailto:' + TO +
+          '?subject=' + encodeURIComponent(SUBJECT) +
+          '&body=' + encodeURIComponent(body);
+      }
+
+      input.addEventListener('keydown', function (e) {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); send(); }
+      });
     })();
 
     // Mobile drop-down menu.
