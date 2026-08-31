@@ -18,6 +18,7 @@
   <!-- ============ NAV  (13284:12693) ============ -->
   <header class="nav" id="top">
     <nav class="nav__left">
+      <button class="pill nav__menu" type="button" aria-expanded="false" aria-controls="nav-menu">Menu</button>
       <a class="pill" href="#">Resume</a>
       <a class="pill" href="#">About</a>
       <a class="pill pill--icon" href="https://www.linkedin.com/in/hardik-malviya-3b27bb329/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
@@ -31,7 +32,7 @@
     </nav>
 
     <!-- centre: portrait (Figma 611:246) -->
-    <a class="avatar avatar--center" href="#top" aria-label="Back to top">
+    <a class="avatar avatar--center" href="#top" data-home aria-label="Back to top">
       <!-- images/avatar.png -->
       <img src="images/avatar.png" alt="Hardik" />
     </a>
@@ -41,7 +42,16 @@
       <a class="avatar" href="https://t.me/colehardik" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
         <img src="images/icon-telegram.png" alt="" />
       </a>
-      <a class="pill pill--dark" href="https://cal.com/cole-hardik-design/discovery-call" target="_blank" rel="noopener noreferrer">Let&rsquo;s connect</a>
+      <a class="pill pill--dark" href="https://cal.com/cole-hardik-design/discovery-call" target="_blank" rel="noopener noreferrer"><span class="on-wide">Let&rsquo;s connect</span><span class="on-narrow">Book a call</span></a>
+    </div>
+
+    <!-- Mobile drop-down. Same .pill language as the bar itself. -->
+    <div class="nav__panel" id="nav-menu" hidden>
+      <a class="pill" href="#top" data-home>Home</a>
+      <a class="pill" href="#">Resume</a>
+      <a class="pill" href="#">About</a>
+      <a class="pill" href="https://www.linkedin.com/in/hardik-malviya-3b27bb329/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a class="pill" href="https://x.com/coleHardik" target="_blank" rel="noopener noreferrer">Twitter (X)</a>
     </div>
   </header>
 
@@ -336,10 +346,10 @@
 
     // Centre portrait acts as "home" — glides back to the hero.
     (function () {
-      var home = document.querySelector('.avatar--center');
-      if (!home) return;
+      var homes = document.querySelectorAll('[data-home]');
+      if (!homes.length) return;
 
-      home.addEventListener('click', function (e) {
+      function goHome(e) {
         e.preventDefault();
         if (window.lenis) {
           window.lenis.scrollTo(0, {
@@ -350,7 +360,43 @@
           var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
         }
-      });
+      }
+
+      Array.prototype.forEach.call(homes, function (el) { el.addEventListener('click', goHome); });
+    })();
+
+    // Mobile drop-down menu.
+    (function () {
+      var nav   = document.querySelector('header.nav');
+      var btn   = document.querySelector('.nav__menu');
+      var panel = document.getElementById('nav-menu');
+      if (!nav || !btn || !panel) return;
+
+      var CLOSE_MS = 220, hideTimer = null;
+
+      function isOpen() { return btn.getAttribute('aria-expanded') === 'true'; }
+
+      function open() {
+        clearTimeout(hideTimer);
+        panel.hidden = false;
+        requestAnimationFrame(function () { panel.classList.add('is-open'); });
+        btn.setAttribute('aria-expanded', 'true');
+        nav.classList.add('nav--menu-open');   // also stops the bar hiding on scroll
+      }
+
+      function close() {
+        if (!isOpen()) return;
+        panel.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+        nav.classList.remove('nav--menu-open');
+        hideTimer = setTimeout(function () { panel.hidden = true; }, CLOSE_MS);
+      }
+
+      btn.addEventListener('click', function () { isOpen() ? close() : open(); });
+      panel.addEventListener('click', function (e) { if (e.target.closest('a')) close(); });
+      document.addEventListener('click', function (e) { if (!nav.contains(e.target)) close(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.key === 'Esc') { close(); btn.focus(); } });
+      window.addEventListener('resize', function () { if (window.innerWidth > 720) close(); });
     })();
 
     // Nav hides on the way down and comes straight back when you scroll up.
@@ -367,6 +413,8 @@
         ticking = false;
         var y = window.scrollY;
         var navH = nav.getBoundingClientRect().height;
+
+        if (nav.classList.contains('nav--menu-open')) { last = y; return; }
 
         if (y <= navH) {
           nav.classList.remove('nav--hidden');

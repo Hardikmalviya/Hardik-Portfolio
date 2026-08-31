@@ -153,6 +153,19 @@ a {
   gap: var(--gap-nav-left);
 }
 
+/* Menu trigger and the drop-down are phone-only; the label on the dark pill
+   swaps with them. */
+.pill.nav__menu,
+.nav__panel,
+.on-narrow { display: none; }
+
+.nav__menu {
+  border: 0;
+  font-family: inherit;
+  font-weight: var(--weight);
+  cursor: pointer;
+}
+
 .nav__right {
   display: flex;
   align-items: center;
@@ -506,15 +519,52 @@ a {
     --r-card:    10px;
   }
 
+  /* One row: [Menu] .......... [Telegram] [Book a call].
+     overflow must be visible so the drop-down isn't clipped. */
   .nav {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 12px;
+    overflow: visible;
   }
 
-  /* Three items don't wrap tidily on a phone, so: pills take the first row,
-     then portrait + telegram + "Let's connect" sit together on the second. */
-  .nav__left  { flex: 0 0 100%; }
-  .nav__right { flex: 1 1 auto; justify-content: flex-start; }
+  .nav__left  { flex: 0 1 auto; }
+  .nav__right { flex: 1 1 auto; justify-content: flex-end; }
+
+  /* the individual pills and the portrait move into the drop-down */
+  .nav__left .pill:not(.nav__menu),
+  .avatar--center { display: none; }
+
+  .pill.nav__menu { display: inline-flex; }
+  .on-wide     { display: none; }
+  .on-narrow   { display: inline; }
+
+  .nav__panel {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-nav-left);
+    padding: 12px var(--pad-page) 16px;
+    background: var(--c-bg);
+    border-bottom: 1px solid var(--c-hairline);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+  }
+
+  .nav__panel.is-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .nav__panel .pill:focus-visible,
+  .nav__menu:focus-visible {
+    outline: 1.5px solid var(--c-ink);
+    outline-offset: 3px;
+  }
 
   .hero {
     height: auto;
