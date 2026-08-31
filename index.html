@@ -61,7 +61,7 @@
          freely; every slide after the first needs class="quote__slide is-idle". -->
     <blockquote class="quote">
       <div class="quote__slide">
-        <p class="quote__text">I&rsquo;ve never seen someone more<br />passionate about his skills than Hardik.<br />He is super easy to work with.</p>
+        <p class="quote__text">&ldquo;I&rsquo;ve never seen someone more<br />passionate about his skills than Hardik.<br />He is super easy to work with.&rdquo;</p>
         <cite class="quote__author">
           <a href="https://x.com/siddharthvij_?s=20" target="_blank" rel="noopener noreferrer">@siddharthvij_</a>
         </cite>
@@ -263,6 +263,7 @@
     })();
 
     // Testimonials: one leaves, then the next arrives — never both at once.
+    // Runs continuously; hovering does not interrupt it.
     (function () {
       var quote  = document.querySelector('.quote');
       var slides = quote ? Array.prototype.slice.call(quote.querySelectorAll('.quote__slide')) : [];
@@ -271,7 +272,7 @@
       var HOLD  = 5000;   // how long each testimonial stays up
       var LEAVE = 290;    // matches .is-leaving's transition-duration
       var ENTER = 420;    // matches .quote__slide's transition-duration
-      var index = 0, timer = null, paused = false;
+      var index = 0, timer = null;
 
       function show(next) {
         var cur = slides[index], nxt = slides[next];
@@ -291,18 +292,13 @@
       }
 
       function step() {
-        if (paused || document.hidden) { schedule(HOLD); return; }
+        if (document.hidden) { schedule(HOLD); return; }   // don't cycle in a background tab
         show((index + 1) % slides.length);
         schedule(HOLD + LEAVE + ENTER);
       }
 
       function schedule(ms) { clearTimeout(timer); timer = setTimeout(step, ms); }
 
-      // Hovering (or focusing a handle) holds the current one still.
-      quote.addEventListener('mouseenter', function () { paused = true; });
-      quote.addEventListener('mouseleave', function () { paused = false; schedule(HOLD); });
-      quote.addEventListener('focusin',    function () { paused = true; });
-      quote.addEventListener('focusout',   function () { paused = false; schedule(HOLD); });
       document.addEventListener('visibilitychange', function () { schedule(HOLD); });
 
       schedule(HOLD);

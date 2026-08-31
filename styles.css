@@ -269,7 +269,9 @@ a {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  justify-content: center;
+  /* sit on the bottom of the stack, so a short quote lines up with the
+     heading's baseline instead of floating in the middle of the tall cell */
+  justify-content: flex-end;
   gap: var(--gap-quote);
   text-align: right;
   opacity: 1;
@@ -311,13 +313,6 @@ a {
 
 .quote__author a {
   color: inherit;
-  text-underline-offset: 3px;
-  transition: color 160ms ease;
-}
-
-.quote__author a:hover {
-  color: var(--c-ink);
-  text-decoration: underline;
 }
 
 .quote__author a:focus-visible {
