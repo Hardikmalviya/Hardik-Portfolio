@@ -301,7 +301,7 @@ a {
 }
 
 .quote__text {
-  width: 286.261px;
+  width: 380px;      /* wide enough for the longest hand-broken line */
   font-size: var(--t-quote);
   line-height: var(--lh-tight);
   letter-spacing: var(--track);
@@ -419,6 +419,9 @@ a {
 
   .hero__heading { width: 340px; }
   .quote__text   { width: 250px; }
+
+  /* let the text find its own breaks once there isn't room for the set ones */
+  .quote__text br { display: none; }
 }
 
 /* --- mobile --- */
