@@ -480,13 +480,6 @@ a {
   gap: var(--gap-nav-left);
 }
 
-.foot__links .pill { transition: background-color 160ms ease, color 160ms ease; }
-
-.foot__links .pill:hover {
-  background: var(--c-ink);
-  color: var(--c-bg);
-}
-
 .foot__links .pill:focus-visible {
   outline: 1.5px solid var(--c-ink);
   outline-offset: 3px;
