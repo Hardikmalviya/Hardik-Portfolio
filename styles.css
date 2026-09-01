@@ -278,15 +278,6 @@ a {
   perspective: 1100px;           /* gives the rotations real depth */
 }
 
-.hero__visor-img {
-  display: block;
-  width: min(620px, 88%);
-  height: auto;
-  position: relative;
-  z-index: 1;
-  will-change: transform;
-}
-
 /* soft ground shadow that trails the visor */
 .hero__visor-canvas {
   /* bleeds past the visor box so a tilted headset never gets sliced off
@@ -302,12 +293,6 @@ a {
 }
 
 .hero__visor.is-3d .hero__visor-canvas { opacity: 1; }
-
-/* the flat cutout is only the loading stand-in once real 3D is up */
-.hero__visor.is-3d .hero__visor-img {
-  opacity: 0;
-  transition: opacity 300ms ease;
-}
 
 .hero__visor-shadow {
   position: absolute;
@@ -713,8 +698,6 @@ a {
     min-height: 170px;
     height: auto;
   }
-
-  .hero__visor-img { width: min(420px, 86%); }
 
   /* the image is flex-centred, so anchor the shadow to the centre of the
      box rather than its bottom edge, which can be far below the headset */

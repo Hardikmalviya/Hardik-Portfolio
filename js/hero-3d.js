@@ -1,8 +1,7 @@
 /* Real-3D Vision Pro hero.
-   Loads models/visionpro.glb into a transparent three.js scene layered over
-   the flat cutout, then fades the image out on the first rendered frame —
-   so the page never shows an empty hole while the model streams in, and the
-   flat version quietly stays put if WebGL is missing or the load fails.
+   Loads models/visionpro.glb into a transparent three.js scene and fades the
+   canvas in on the first rendered frame. If WebGL is missing or the load
+   fails the hero simply stays empty — nothing breaks.
 
    The cursor-follow is the same critically-damped spring as hero-visor.js,
    but here it drives real yaw/pitch on the model, so the perspective and
@@ -14,9 +13,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 (function () {
   var visor = document.querySelector('.hero__visor');
-  var img = document.querySelector('.hero__visor-img');
   var shadow = document.querySelector('.hero__visor-shadow');
-  if (!visor || !img) return;
+  if (!visor) return;
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -25,7 +23,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   var BASE_PITCH =  0.12;
   var YAW_RANGE  =  0.55;           /* how far the cursor can turn it (rad) */
   var PITCH_RANGE = 0.22;
-  var SHIFT_X = 0.26, SHIFT_Y = 0.08;  /* world-unit drift toward cursor */
+  var SHIFT_X = 0.20, SHIFT_Y = 0.07;  /* world-unit drift toward cursor */
   var STIFF = 110, DAMP = 19;       /* same spring as the 2D version */
   var IDLE_X = 0.16, IDLE_Y = 0.12;
 
@@ -84,7 +82,9 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
        occupies the same footprint the flat cutout did */
     var fw = visor.clientWidth / canvas.clientWidth;
     var fh = visor.clientHeight / canvas.clientHeight;
-    var s = Math.min(vw * fw / modelSize.x, vh * fh / modelSize.y) * 0.95;
+    /* phones are width-bound, so they get more of the box than desktop */
+    var fill = window.innerWidth <= 720 ? 0.92 : 0.70;
+    var s = Math.min(vw * fw / modelSize.x, vh * fh / modelSize.y) * fill;
     pivot.scale.setScalar(s);
   }
 
@@ -178,10 +178,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
     if (!ready) {
       ready = true;
-      visor.classList.add('is-3d');
-      /* tells hero-visor.js to stand down */
-      window.dispatchEvent(new CustomEvent('heroVisor3DReady'));
-      img.style.transform = '';
+      visor.classList.add('is-3d');   /* fades the canvas in */
     }
   }
 
@@ -202,7 +199,6 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
       /* one static, nicely posed frame — no motion */
       renderer.render(scene, camera);
       visor.classList.add('is-3d');
-      window.dispatchEvent(new CustomEvent('heroVisor3DReady'));
       return;
     }
     setRunning(true);
