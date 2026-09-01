@@ -19,7 +19,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---- pose + motion constants ------------------------------------- */
-  var BASE_YAW   = -0.68;           /* resting 3/4 turn, matches the cutout */
+  var BASE_YAW   = -Math.PI / 2;    /* glass pointing straight at the viewer */
   var BASE_PITCH =  0;              /* dead level at rest */
   var YAW_RANGE  =  0.55;           /* how far the cursor can turn it (rad) */
   var PITCH_RANGE = 0.22;
@@ -83,8 +83,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     var fw = visor.clientWidth / canvas.clientWidth;
     var fh = visor.clientHeight / canvas.clientHeight;
     /* phones are width-bound, so they get more of the box than desktop */
-    var fill = window.innerWidth <= 720 ? 0.92 : 0.70;
-    var s = Math.min(vw * fw / modelSize.x, vh * fh / modelSize.y) * fill;
+    var frac = window.innerWidth <= 720 ? 0.78 : 0.56;
+    var s = Math.min(vw * fw / modelSize.x, vh * fh / modelSize.y) * frac;
     pivot.scale.setScalar(s);
   }
 
