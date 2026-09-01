@@ -20,7 +20,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
   /* ---- pose + motion constants ------------------------------------- */
   var BASE_YAW   = -0.68;           /* resting 3/4 turn, matches the cutout */
-  var BASE_PITCH =  0.12;
+  var BASE_PITCH =  0;              /* dead level at rest */
   var YAW_RANGE  =  0.55;           /* how far the cursor can turn it (rad) */
   var PITCH_RANGE = 0.22;
   var SHIFT_X = 0.20, SHIFT_Y = 0.07;  /* world-unit drift toward cursor */
