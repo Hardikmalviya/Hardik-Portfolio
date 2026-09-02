@@ -619,6 +619,10 @@ a {
     background: none;
   }
 
+  /* the display:flex above would otherwise override the hidden attribute,
+     leaving invisible links clickable under a closed menu */
+  .nav__panel[hidden] { display: none; }
+
   .nav__panel .pill {
     transform-origin: top left;
 
