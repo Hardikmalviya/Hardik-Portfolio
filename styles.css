@@ -737,3 +737,46 @@ a {
   html { scroll-behavior: auto; }
   * { transition-duration: 0.01ms !important; }
 }
+
+
+/* =========================================================
+   DARK THEME — double-click anywhere to flip (js/theme.js).
+   The switch rides the View Transitions API: a circle wipes
+   out from the click point, vuk.fyi style.
+   ========================================================= */
+html.dark {
+  color-scheme: dark;
+
+  --c-bg:          #0d0d0e;
+  --c-ink:         #f2f2f0;
+  --c-ink-muted:   #9a9a9e;
+  --c-ink-ghost:   #4b4b50;
+  --c-pill:        #1d1d1f;
+  --c-card:        #151517;
+  --c-shot:        #1a1a1c;
+  --c-shot-alt:    #202023;
+  --c-hairline:    rgba(255, 255, 255, 0.14);
+  --c-avatar-ring: #242427;
+}
+
+html.dark .pill:hover { background: #2a2a2d; }
+
+/* the black pill flips to white so it still reads as the loudest button */
+html.dark .pill--dark { background: #f2f2f0; color: #0d0d0e; }
+html.dark .pill--dark:hover { background: #ffffff; }
+
+/* LinkedIn / X glyphs are dark SVG files: flip them white */
+html.dark .pill__icon { filter: invert(1) hue-rotate(180deg); }
+
+/* the headset's contact shadow reads as a soft pool of light instead */
+html.dark .hero__visor-shadow { opacity: 0.14; }
+
+/* View-transition snapshots: the new page is revealed by a clip-path
+   circle animated from JS, so the default cross-fade must not run. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
