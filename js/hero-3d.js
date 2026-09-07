@@ -88,6 +88,74 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     pivot.scale.setScalar(s);
   }
 
+  /* ---- EyeSight-style aurora in the glass ---------------------------
+     The glass mesh has no UVs, so a small animated canvas is projected
+     onto it in the shader via the mesh's own geometry coordinates. It
+     stays dark for a moment after load, then breathes to life. */
+  var AUR_W = 512, AUR_H = 256;
+  var aurCanvas = document.createElement('canvas');
+  aurCanvas.width = AUR_W; aurCanvas.height = AUR_H;
+  var aurCtx = aurCanvas.getContext('2d');
+  var aurTex = new THREE.CanvasTexture(aurCanvas);
+  aurTex.colorSpace = THREE.SRGBColorSpace;
+  var aurUniforms = null;
+  var lightsAt = 0;            /* when the fade-in starts */
+  var LIGHT_DELAY = 2400;      /* ms after the model appears */
+  var LIGHT_FADE = 2600;       /* ms to full brightness */
+
+  /* four soft blobs on slow, non-repeating orbits — Apple's palette */
+  var BLOBS = [
+    { c: '255,61,139',  r: 150, ax: 0.30, ay: 0.16, sx: 0.23, sy: 0.31, px: 0.0, py: 1.9 },
+    { c: '255,157,46',  r: 120, ax: 0.34, ay: 0.20, sx: 0.17, sy: 0.26, px: 2.1, py: 0.4 },
+    { c: '123,92,255',  r: 165, ax: 0.28, ay: 0.18, sx: 0.17, sy: 0.22, px: 4.0, py: 2.6 },
+    { c: '64,150,255',  r: 105, ax: 0.36, ay: 0.22, sx: 0.29, sy: 0.19, px: 1.2, py: 4.4 }
+  ];
+
+  function drawAurora(t) {
+    var g = aurCtx;
+    g.globalCompositeOperation = 'source-over';
+    g.fillStyle = '#000';
+    g.fillRect(0, 0, AUR_W, AUR_H);
+    g.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < BLOBS.length; i++) {
+      var b = BLOBS[i];
+      var cx = AUR_W * (0.5 + Math.sin(t * b.sx + b.px) * b.ax);
+      var cy = AUR_H * (0.46 + Math.cos(t * b.sy + b.py) * b.ay);
+      var breathe = 0.72 + 0.28 * Math.sin(t * 0.5 + b.px * 2.0);
+      var grad = g.createRadialGradient(cx, cy, 0, cx, cy, b.r);
+      grad.addColorStop(0, 'rgba(' + b.c + ',' + (0.62 * breathe).toFixed(3) + ')');
+      grad.addColorStop(0.55, 'rgba(' + b.c + ',' + (0.20 * breathe).toFixed(3) + ')');
+      grad.addColorStop(1, 'rgba(' + b.c + ',0)');
+      g.fillStyle = grad;
+      g.fillRect(0, 0, AUR_W, AUR_H);
+    }
+    /* keep the rim of the glass dark so the glow reads as inside it */
+    g.globalCompositeOperation = 'destination-in';
+    var fade = g.createRadialGradient(AUR_W / 2, AUR_H / 2, AUR_H * 0.25, AUR_W / 2, AUR_H / 2, AUR_W * 0.52);
+    fade.addColorStop(0, 'rgba(0,0,0,1)');
+    fade.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = fade;
+    g.fillRect(0, 0, AUR_W, AUR_H);
+    aurTex.needsUpdate = true;
+  }
+
+  function wireAurora(mat) {
+    mat.onBeforeCompile = function (shader) {
+      shader.uniforms.auroraMap = { value: aurTex };
+      shader.uniforms.auroraIntensity = { value: 0 };
+      aurUniforms = shader.uniforms;
+      shader.vertexShader = 'varying vec3 vAuroraPos;\n' + shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        '#include <begin_vertex>\n  vAuroraPos = position;'
+      );
+      shader.fragmentShader = 'uniform sampler2D auroraMap;\nuniform float auroraIntensity;\nvarying vec3 vAuroraPos;\n' + shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\n  vec2 aUv = vec2(vAuroraPos.y * 0.5 + 0.5, 0.5 - vAuroraPos.z * 0.926);\n  totalEmissiveRadiance += texture2D(auroraMap, aUv).rgb * auroraIntensity;'
+      );
+    };
+    mat.needsUpdate = true;
+  }
+
   /* ---- model --------------------------------------------------------- */
   var ready = false;
   new GLTFLoader().load('models/visionpro.glb', function (gltf) {
@@ -97,6 +165,12 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     var box = new THREE.Box3().setFromObject(model);
     var c = box.getCenter(new THREE.Vector3());
     model.position.sub(c);
+
+    var glass = null;
+    model.traverse(function (o) {
+      if (!glass && o.isMesh && o.material && o.material.name === 'FOugkDgsmvxAjLB') glass = o;
+    });
+    if (glass) { wireAurora(glass.material); lightsAt = performance.now() + LIGHT_DELAY; }
 
     pivot.add(model);
     pivot.rotation.set(BASE_PITCH, BASE_YAW, 0);
@@ -174,6 +248,13 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
       shadow.style.opacity = (0.30 - Math.abs(x) * 0.08 - y * 0.05).toFixed(3);
     }
 
+    if (aurUniforms && lightsAt && now > lightsAt) {
+      var ramp = Math.min((now - lightsAt) / LIGHT_FADE, 1);
+      ramp = 1 - Math.pow(1 - ramp, 3);              /* ease-out */
+      drawAurora(now / 1000);
+      aurUniforms.auroraIntensity.value = ramp * 1.35;
+    }
+
     renderer.render(scene, camera);
 
     if (!ready) {
@@ -196,7 +277,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     started = true;
     resize();
     if (reduced) {
-      /* one static, nicely posed frame — no motion */
+      /* one static, nicely posed frame — lights on, no motion */
+      if (aurUniforms) { drawAurora(1.7); aurUniforms.auroraIntensity.value = 1.35; }
       renderer.render(scene, camera);
       visor.classList.add('is-3d');
       return;
