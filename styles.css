@@ -747,22 +747,25 @@ a {
 html.dark {
   color-scheme: dark;
 
-  --c-bg:          #0d0d0e;
-  --c-ink:         #f2f2f0;
-  --c-ink-muted:   #9a9a9e;
-  --c-ink-ghost:   #4b4b50;
-  --c-pill:        #1d1d1f;
-  --c-card:        #151517;
-  --c-shot:        #1a1a1c;
-  --c-shot-alt:    #202023;
-  --c-hairline:    rgba(255, 255, 255, 0.14);
-  --c-avatar-ring: #242427;
+  /* Vercel's dark scale: #0a0a0a ground, #ededed ink, #a1a1a1 secondary */
+  --c-bg:          #0a0a0a;
+  --c-ink:         #ededed;
+  --c-ink-muted:   #a1a1a1;
+  --c-ink-ghost:   #565656;
+  --c-pill:        #1a1a1a;
+  --c-card:        #111111;
+  --c-shot:        #141414;
+  --c-shot-alt:    #1a1a1a;
+  --c-hairline:    rgba(255, 255, 255, 0.12);
+  --c-avatar-ring: #262626;
 }
 
-html.dark .pill:hover { background: #2a2a2d; }
+/* pill labels sit a step brighter than body-muted so the nav reads clearly */
+html.dark .pill { color: #d4d4d4; }
+html.dark .pill:hover { background: #262626; color: #ededed; }
 
 /* the black pill flips to white so it still reads as the loudest button */
-html.dark .pill--dark { background: #f2f2f0; color: #0d0d0e; }
+html.dark .pill--dark { background: #ededed; color: #0a0a0a; }
 html.dark .pill--dark:hover { background: #ffffff; }
 
 /* LinkedIn / X glyphs are dark SVG files: flip them white */
