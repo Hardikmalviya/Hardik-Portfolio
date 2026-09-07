@@ -99,7 +99,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   var aurTex = new THREE.CanvasTexture(aurCanvas);
   aurTex.colorSpace = THREE.SRGBColorSpace;
   var aurUniforms = null;
-  var lightsAt = 0;            /* when the fade-in starts */
+  var lightsAt = 0, litOnce = false;   /* when the fade-in starts */
   var LIGHT_DELAY = 2400;      /* ms after the model appears */
   var LIGHT_FADE = 2600;       /* ms to full brightness */
 
@@ -249,6 +249,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     }
 
     if (aurUniforms && lightsAt && now > lightsAt) {
+      if (!litOnce) { litOnce = true; window.dispatchEvent(new CustomEvent('heroLightsOn')); }
       var ramp = Math.min((now - lightsAt) / LIGHT_FADE, 1);
       ramp = 1 - Math.pow(1 - ramp, 3);              /* ease-out */
       drawAurora(now / 1000);
