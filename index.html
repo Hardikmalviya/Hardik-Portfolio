@@ -20,7 +20,7 @@
     <nav class="nav__left">
       <button class="pill nav__menu" type="button" aria-expanded="false" aria-controls="nav-menu">Menu<svg class="nav__chev" viewBox="0 0 18 18" width="12" height="12" aria-hidden="true" focusable="false"><path d="M4.5 7 L9 11.5 L13.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
       <a class="pill" href="files/Hardik-Malviya-Resume.pdf" target="_blank" rel="noopener">Resume</a>
-      <a class="pill" href="#about" data-about>About</a>
+      <a class="pill" href="#">About</a>
       <a class="pill pill--icon" href="https://www.linkedin.com/in/hardik-malviya-3b27bb329/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
         <!-- images/icon-social-1.svg -->
         <img class="pill__icon" src="images/icon-social-1.svg" data-fallback="https://www.figma.com/api/mcp/asset/a6f35f2a-ec60-4289-9327-181569449636.svg" alt="" />
@@ -49,7 +49,7 @@
     <div class="nav__panel" id="nav-menu" hidden>
       <a class="pill" href="#top" data-home>Home</a>
       <a class="pill" href="files/Hardik-Malviya-Resume.pdf" target="_blank" rel="noopener">Resume</a>
-      <a class="pill" href="#about" data-about>About</a>
+      <a class="pill" href="#">About</a>
       <a class="pill" href="https://www.linkedin.com/in/hardik-malviya-3b27bb329/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       <a class="pill" href="https://x.com/coleHardik" target="_blank" rel="noopener noreferrer">Twitter (X)</a>
     </div>
@@ -86,28 +86,6 @@
       </div>
     </blockquote>
   </section>
-
-  <!-- ============ ABOUT (overlay) ============
-       Opens over the hero: the heading and testimonial step aside, and the
-       page hands its scroll to this overlay. Scrolling darkens the page,
-       zooms the headset, lights its display, then brings in the intro. -->
-  <div class="about" id="about" hidden>
-    <div class="about__bg"></div>
-    <div class="about__scroll" data-lenis-prevent tabindex="-1">
-      <div class="about__track">
-        <div class="about__stage">
-          <p class="about__hint">scroll</p>
-          <div class="about__content">
-            <p class="about__label">About</p>
-            <h2 class="about__title">Hey, I&rsquo;m Hardik Malviya :)</h2>
-            <p class="about__text">Product designer from Bengaluru, India. For the past two years I&rsquo;ve been taking web and mobile products from research and wireframes all the way to high&#8209;fidelity UI, motion, and shipped front&#8209;end. These days I design for New York clients at Parallel Studio.</p>
-            <p class="about__text">I like minimal, user&#8209;centred interfaces that serve clear business goals. And I ship my own designs with AI dev tools instead of waiting on an engineering queue.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button class="about__close" type="button" aria-label="Close about">&times;</button>
-  </div>
 
   <!-- ============ WORK  (13284:12713) ============ -->
   <section class="work">
@@ -288,7 +266,6 @@
   }
   </script>
   <script type="module" src="js/hero-3d.js"></script>
-  <script src="js/hero-about.js" defer></script>
   <script src="js/lenis.min.js"></script>
   <script>
     (function () {

@@ -71,7 +71,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     fitModel();
   }
 
-  var modelSize = null, baseScale = 0;
+  var modelSize = null;
   function fitModel() {
     if (!modelSize) return;
     /* fit by whichever axis is tighter, with ~12% air around the model */
@@ -84,22 +84,14 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     var fh = visor.clientHeight / canvas.clientHeight;
     /* phones are width-bound, so they get more of the box than desktop */
     var frac = window.innerWidth <= 720 ? 0.78 : 0.56;
-    baseScale = Math.min(vw * fw / modelSize.x, vh * fh / modelSize.y) * frac;
-    applyPose();
+    var s = Math.min(vw * fw / modelSize.x, vh * fh / modelSize.y) * frac;
+    pivot.scale.setScalar(s);
   }
 
   /* ---- model --------------------------------------------------------- */
   var ready = false;
   new GLTFLoader().load('models/visionpro.glb', function (gltf) {
     var model = gltf.scene;
-
-    model.traverse(function (o) {
-      if (o.isMesh && o.material && o.material.emissiveMap) {
-        o.material.emissive.setRGB(1, 1, 1);
-        o.material.emissiveIntensity = 0;
-        emissives.push(o.material);
-      }
-    });
 
     /* centre the geometry so the pivot spins through the middle */
     var box = new THREE.Box3().setFromObject(model);
@@ -152,39 +144,6 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   /* ---- loop ---------------------------------------------------------- */
   var rafId = 0, last = 0, running = false, inView = true, t0 = performance.now();
 
-  /* ---- About mode ----------------------------------------------------
-     js/hero-about.js drives aboutP with the About overlay's scroll:
-     0 = normal hero, 1 = fully zoomed in, lit up, on the dark page. */
-  var aboutP = 0;
-  var glow = new THREE.PointLight(0xdfe8ff, 0, 12, 2);
-  glow.position.set(0, 0.25, 2.2);
-  scene.add(glow);
-  var emissives = [];   /* materials with a display/emissive map, found at load */
-
-  window.heroVisor = {
-    setAbout: function (p) {
-      aboutP = Math.max(0, Math.min(1, p));
-      glow.intensity = aboutP * 26;
-      renderer.toneMappingExposure = 1.15 + aboutP * 0.3;
-      for (var i = 0; i < emissives.length; i++) emissives[i].emissiveIntensity = aboutP * 2.6;
-      /* under reduced motion there is no loop, so paint the change now */
-      if (reduced && started) { applyPose(); renderer.render(scene, camera); }
-    }
-  };
-
-  function applyPose() {
-    var damp = 1 - aboutP * 0.6;   /* the follow calms down as you go in */
-    /* phones start from a fuller frame, so About grows and lifts less there */
-    var narrow = window.innerWidth <= 720;
-    var zoom = 1 + aboutP * (narrow ? 0.55 : 1.15);
-    var lift = aboutP * (narrow ? 0.55 : 1.1);
-    pivot.rotation.y = BASE_YAW + x * YAW_RANGE * damp;
-    pivot.rotation.x = BASE_PITCH + y * PITCH_RANGE * damp;
-    pivot.position.x = x * SHIFT_X * damp;
-    pivot.position.y = -y * SHIFT_Y * damp + lift;   /* up and out of the intro's way */
-    if (baseScale) pivot.scale.setScalar(baseScale * zoom);
-  }
-
   function frame(now) {
     rafId = requestAnimationFrame(frame);
     var dt = Math.min((now - last) / 1000, 1 / 30);
@@ -205,7 +164,10 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     x += vx * dt;
     y += vy * dt;
 
-    applyPose();
+    pivot.rotation.y = BASE_YAW + x * YAW_RANGE;
+    pivot.rotation.x = BASE_PITCH + y * PITCH_RANGE;
+    pivot.position.x = x * SHIFT_X;
+    pivot.position.y = -y * SHIFT_Y;
 
     if (shadow) {
       shadow.style.transform = 'translateX(' + (x * 26).toFixed(1) + 'px) scaleX(' + (1 - Math.abs(x) * 0.14).toFixed(3) + ')';
@@ -242,9 +204,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     setRunning(true);
   }
 
-  var ro = new ResizeObserver(resize);
-  ro.observe(visor);
-  ro.observe(canvas);   /* About mode swaps the canvas to fullscreen */
+  new ResizeObserver(resize).observe(visor);
   new IntersectionObserver(function (entries) {
     inView = entries[0].isIntersecting;
     if (started && !reduced) setRunning(inView);
