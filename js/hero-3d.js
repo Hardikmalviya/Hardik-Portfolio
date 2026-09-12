@@ -86,6 +86,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     var frac = window.innerWidth <= 720 ? 0.78 : 0.56;
     var s = Math.min(vw * fw / modelSize.x, vh * fh / modelSize.y) * frac;
     pivot.scale.setScalar(s);
+    /* the light pool keeps a constant world size, whatever the model scale */
+    glow.scale.set(2.1 / s, 1.4 / s, 1);
   }
 
   /* ---- EyeSight-style aurora in the glass ---------------------------
@@ -156,6 +158,48 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     mat.needsUpdate = true;
   }
 
+  /* ---- light spill (dark theme) -------------------------------------
+     A soft billboard glow parented to the pivot just in front of the
+     glass. Because it rides the pivot, it swings wherever the face
+     points; its tint is sampled live from the aurora, so the room light
+     always matches what the display shows. Additive and very dim - it
+     reads as light in the air, not a sticker. */
+  var glowTexCanvas = document.createElement('canvas');
+  glowTexCanvas.width = glowTexCanvas.height = 256;
+  (function () {
+    var g = glowTexCanvas.getContext('2d');
+    var grad = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+    grad.addColorStop(0, 'rgba(255,255,255,0.9)');
+    grad.addColorStop(0.35, 'rgba(255,255,255,0.28)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 256, 256);
+  })();
+  var glowMat = new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(glowTexCanvas),
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    transparent: true,
+    opacity: 0
+  });
+  var glow = new THREE.Sprite(glowMat);
+  glow.position.set(0.58, -0.06, 0);   /* local +x = straight out of the glass */
+  pivot.add(glow);
+
+  var glowOp = 0, auroraRamp = 0, tintTick = 0;
+  var tintCanvas = document.createElement('canvas');
+  tintCanvas.width = tintCanvas.height = 1;
+  var tintCtx = tintCanvas.getContext('2d', { willReadFrequently: true });
+
+  function updateGlowTint() {
+    /* the browser averages the whole aurora for us via a 1px downscale */
+    tintCtx.drawImage(aurCanvas, 0, 0, 1, 1);
+    var p = tintCtx.getImageData(0, 0, 1, 1).data;
+    /* normalise so the tint keeps colour but never darkens the sprite */
+    var m = Math.max(p[0], p[1], p[2], 1);
+    glowMat.color.setRGB(0.35 + 0.65 * p[0] / m, 0.35 + 0.65 * p[1] / m, 0.35 + 0.65 * p[2] / m);
+  }
+
   /* ---- model --------------------------------------------------------- */
   var ready = false;
   new GLTFLoader().load('models/visionpro.glb', function (gltf) {
@@ -176,9 +220,12 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     pivot.rotation.set(BASE_PITCH, BASE_YAW, 0);
 
     /* measure the box in the resting pose, not the raw export orientation,
-       so the fit reflects what's actually on screen */
+       so the fit reflects what's actually on screen (the glow sprite steps
+       aside for the measurement - it would balloon the box) */
+    pivot.remove(glow);
     pivot.updateMatrixWorld(true);
     modelSize = new THREE.Box3().setFromObject(pivot).getSize(new THREE.Vector3());
+    pivot.add(glow);
     resize();
     start();
   }, undefined, function () { /* load failed: flat image stays */ });
@@ -254,7 +301,14 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
       ramp = 1 - Math.pow(1 - ramp, 3);              /* ease-out */
       drawAurora(now / 1000);
       aurUniforms.auroraIntensity.value = ramp * 1.35;
+      auroraRamp = ramp;
+      if ((tintTick++ & 7) === 0) updateGlowTint();
     }
+
+    /* light spills into the room only when the room is dark */
+    var glowTarget = document.documentElement.classList.contains('dark') ? auroraRamp * 0.5 : 0;
+    glowOp += (glowTarget - glowOp) * Math.min(1, dt * 4);
+    glowMat.opacity = glowOp;
 
     renderer.render(scene, camera);
 
@@ -279,7 +333,12 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     resize();
     if (reduced) {
       /* one static, nicely posed frame — lights on, no motion */
-      if (aurUniforms) { drawAurora(1.7); aurUniforms.auroraIntensity.value = 1.35; }
+      if (aurUniforms) {
+        drawAurora(1.7);
+        aurUniforms.auroraIntensity.value = 1.35;
+        updateGlowTint();
+        glowMat.opacity = document.documentElement.classList.contains('dark') ? 0.34 : 0;
+      }
       renderer.render(scene, camera);
       visor.classList.add('is-3d');
       return;
