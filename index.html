@@ -12,6 +12,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
 <link rel="stylesheet" href="styles.css" />
+<!-- start the heavy hero downloads immediately instead of after the scripts wake up -->
+<link rel="preload" href="images/visionpro-poster.webp" as="image" fetchpriority="high" />
+<link rel="preload" href="models/visionpro.glb" as="fetch" crossorigin />
+<link rel="modulepreload" href="js/vendor/three/three.module.min.js" />
+<link rel="modulepreload" href="js/vendor/three/three.core.min.js" />
+<link rel="modulepreload" href="js/vendor/three/addons/loaders/GLTFLoader.js" />
+<link rel="modulepreload" href="js/vendor/three/addons/loaders/DRACOLoader.js" />
+<link rel="modulepreload" href="js/vendor/three/addons/utils/BufferGeometryUtils.js" />
+<link rel="modulepreload" href="js/vendor/three/addons/environments/RoomEnvironment.js" />
 <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}</script>
 </head>
 <body>
@@ -62,10 +71,13 @@
       I create clean, magnetic design <span>that makes products feel effortless to use.</span>
     </p>
 
-    <!-- Folding iPhone Duo showing the portfolio (js/hero-duo.js).
-         Decorative, never intercepts clicks. -->
+    <!-- 3D Vision Pro that follows the cursor (js/hero-3d.js). Decorative,
+         never intercepts clicks. -->
     <div class="hero__visor" aria-hidden="true">
       <span class="hero__visor-shadow"></span>
+      <!-- instant stand-in: a 15KB snapshot of the model in its resting
+           pose; the live 3D fades in over it when ready -->
+      <img class="hero__visor-img" src="images/visionpro-poster.webp" alt="" draggable="false" fetchpriority="high" />
     </div>
 
     <!-- Testimonials swap every 5s: the current one leaves, then the next
@@ -266,7 +278,7 @@
     }
   }
   </script>
-  <script type="module" src="js/hero-duo.js"></script>
+  <script type="module" src="js/hero-3d.js"></script>
   <script src="js/theme.js" defer></script>
   <script src="js/sound.js" defer></script>
   <script src="js/click-spark.js" defer></script>

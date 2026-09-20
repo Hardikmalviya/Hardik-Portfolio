@@ -278,7 +278,17 @@ a {
   perspective: 1100px;           /* gives the rotations real depth */
 }
 
-/* soft ground shadow that trails the visor */
+/* the poster is the first paint; the canvas replaces it when live */
+.hero__visor-img {
+  position: relative;
+  z-index: 1;
+  height: 56%;            /* matches the 3D fit on wide screens */
+  width: auto;
+  transition: opacity 350ms ease;
+}
+
+.hero__visor.is-3d .hero__visor-img { opacity: 0; }
+
 .hero__visor-canvas {
   /* bleeds past the visor box so a tilted headset never gets sliced off
      at the canvas edge */
@@ -702,6 +712,8 @@ a {
     min-height: 170px;
     height: auto;
   }
+
+  .hero__visor-img { height: auto; width: 78%; }   /* narrow screens fit by width */
 
   /* the image is flex-centred, so anchor the shadow to the centre of the
      box rather than its bottom edge, which can be far below the headset */
