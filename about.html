@@ -40,10 +40,13 @@
 
   .statement {
     font-size: clamp(26px, 3.4vw, 42px);
+    font-weight: 500;              /* lighter than the site's 600: airier at this size */
     line-height: 1.28;
     letter-spacing: var(--track);
     color: var(--c-ink);
   }
+
+  .statement--soft { color: var(--c-ink-muted); }
 
   .statement + .statement { margin-top: 0.4em; }
 
@@ -105,12 +108,7 @@
   }
 
   .record__table { display: none; }
-  .record__table.is-on { display: block; animation: rows-in 320ms var(--ease-out); }
-
-  @keyframes rows-in {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: none; }
-  }
+  .record__table.is-on { display: block; }
 
   .row {
     display: grid;
@@ -216,6 +214,42 @@
   }
   .hourbar__ticks i.on { background: rgba(255, 255, 255, 0.85); height: 16px; }
 
+  /* ---- entrance: everything rises in, one beat after another ---- */
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .statement,
+    .record__tabs { animation: rise 700ms var(--ease-out) both; }
+    .statement:nth-of-type(1) { animation-delay: 90ms; }
+    .statement:nth-of-type(2) { animation-delay: 220ms; }
+    .statement:nth-of-type(3) { animation-delay: 350ms; }
+    .record__tabs { animation-delay: 500ms; }
+
+    /* the underlines draw themselves once their words have landed */
+    .mark::after {
+      transform-origin: left center;
+      animation: mark-in 500ms var(--ease-out) 900ms both;
+    }
+    @keyframes mark-in {
+      from { transform: scaleX(0) rotate(-0.4deg); }
+      to   { transform: scaleX(1) rotate(-0.4deg); }
+    }
+
+    /* rows cascade in on load and every time the tab flips */
+    .record__table.is-on .row { animation: rise 460ms var(--ease-out) both; }
+    .record__table.is-on .row:nth-child(1) { animation-delay: 60ms; }
+    .record__table.is-on .row:nth-child(2) { animation-delay: 120ms; }
+    .record__table.is-on .row:nth-child(3) { animation-delay: 180ms; }
+    .record__table.is-on .row:nth-child(4) { animation-delay: 240ms; }
+    .record__table.is-on .row:nth-child(5) { animation-delay: 300ms; }
+
+    .sheet__foot { animation: rise 700ms var(--ease-out) 650ms both; }
+    .sky__note   { animation: rise 900ms var(--ease-out) 250ms both; }
+  }
+
   @media (max-width: 720px) {
     .row { grid-template-columns: 64px 1fr; }
     .row__role { grid-column: 2; text-align: left; margin-top: 2px; }
@@ -262,7 +296,7 @@
 
     <section class="about-hero">
       <p class="statement">I&rsquo;m currently designing at <span class="mark">Parallel Studio</span> and building <span class="mark">Convo</span> on the side.</p>
-      <p class="statement">Two years of taking products from research and wireframes to shipped, animated front&#8209;end. Looking to keep building things that feel effortless, with people I enjoy working with.</p>
+      <p class="statement statement--soft">Looking to keep building products that feel effortless, with people I enjoy working with.</p>
       <p class="statement">Reach out via <a href="mailto:hardikmalviy@gmail.com">email</a> <span class="ghost">or dm on</span> <a href="https://x.com/coleHardik" target="_blank" rel="noopener noreferrer">X</a><span class="ghost">.</span></p>
     </section>
 

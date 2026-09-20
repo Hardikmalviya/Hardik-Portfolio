@@ -114,7 +114,7 @@
   }
 
   /* ---- wiring ---------------------------------------------------------- */
-  var HOVERABLE = '.pill, .avatar, .quote__author a, .foot a';
+  var HOVERABLE = '.pill, .avatar, .quote__author a, .foot a, .record__tab, a.row, .sheet__links a, .sheet__icons a, .statement a';
 
   /* the context can only start on a gesture; the first press wakes it */
   function wake() {
