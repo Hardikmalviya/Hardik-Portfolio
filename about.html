@@ -161,70 +161,123 @@
   .sky__note a { color: rgba(255, 255, 255, 0.8); transition: color 160ms ease; }
   .sky__note a:hover { color: #ffffff; }
 
-  /* bottom-left sky dial: drag through the day, or leave it on Live and
-     it follows the visitor's own clock */
+  /* bottom-left sky dial: eight notches plus Live. Drag the scale, click
+     the ticks, or use the arrows; the last notch hands the sky back to
+     the visitor's own clock. */
   .skypill {
     position: absolute;
     left: var(--pad-page);
     bottom: 26px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 7px 8px 7px 10px;
-    border-radius: var(--r-pill);
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
+    width: auto;
+    padding: 3px 12px 3px 3px;
+    border-radius: 999px;
+    background: rgba(16, 18, 32, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(10px);
     user-select: none;
-    transition: background 200ms ease, border-color 200ms ease;
   }
-  .skypill:hover { background: rgba(255, 255, 255, 0.11); border-color: rgba(255, 255, 255, 0.2); }
 
   .skypill__dial {
+    position: relative;
     display: grid;
     place-items: center;
     width: 24px; height: 24px;
     padding: 0;
     border: 0;
-    border-radius: 50%;
+    border-radius: 999px;
     background: none;
     color: inherit;
     cursor: pointer;
-    transition: transform 300ms var(--ease-out), color 200ms ease;
+    transition: background 200ms var(--ease-out), transform 200ms var(--ease-out);
   }
-  .skypill__dial:hover { color: #fff; transform: rotate(-12deg); }
-  .skypill__dial svg { display: block; }
+  .skypill__dial:hover { background: rgba(255, 255, 255, 0.1); }
+  .skypill__dial:active { transform: scale(0.92); }
+
+  /* every icon is stacked; only the active one is shown, so they cross-fade */
+  .skypill__icon {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 14px; height: 14px;
+    opacity: 0;
+    transform: rotate(-20deg) scale(0.7);
+    pointer-events: none;
+    transition: opacity 320ms var(--ease-out), transform 320ms var(--ease-out);
+  }
+  .skypill__icon svg { width: 100%; height: 100%; }
+  .skypill[data-icon="sun"]        .skypill__icon[data-icon="sun"],
+  .skypill[data-icon="moon"]       .skypill__icon[data-icon="moon"],
+  .skypill[data-icon="moonStars"]  .skypill__icon[data-icon="moonStars"],
+  .skypill[data-icon="sunHorizon"] .skypill__icon[data-icon="sunHorizon"],
+  .skypill[data-icon="cloudSun"]   .skypill__icon[data-icon="cloudSun"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* a small spark marks the Live state */
+  .skypill__spark {
+    position: absolute;
+    top: -1px; right: -1px;
+    display: grid;
+    place-items: center;
+    width: 7px; height: 7px;
+    color: currentColor;
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+    pointer-events: none;
+    transition: opacity 280ms var(--ease-out), transform 280ms var(--ease-out);
+  }
+  .skypill__spark svg { width: 100%; height: 100%; }
+  .skypill__dial[data-state="live"] .skypill__spark { opacity: 1; transform: scale(1) rotate(0deg); }
 
   .skypill__scale {
     position: relative;
-    padding: 8px 2px;              /* a taller grab area than it looks */
+    display: flex;
+    align-items: center;
+    width: 96px;
+    height: 22px;
     cursor: ew-resize;
+    touch-action: none;
     outline: none;
   }
-  .skypill__scale:focus-visible { box-shadow: 0 0 0 2px rgba(255,255,255,0.5); border-radius: 6px; }
+  .skypill__scale:focus-visible { border-radius: 6px; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45); }
 
-  .skypill__ticks { display: flex; align-items: center; gap: 5px; }
-  .skypill__ticks i {
-    width: 2px;
-    height: 11px;
+  .skypill__ticks {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .skypill__tick {
+    width: 1px;
+    height: 6px;
     border-radius: 1px;
-    background: rgba(255, 255, 255, 0.24);
-    transition: height 220ms var(--ease-out), background 220ms ease, opacity 220ms ease;
+    background: currentColor;
+    opacity: 0.42;
   }
-  .skypill__ticks i.on  { background: rgba(255, 255, 255, 0.9); height: 17px; }
-  .skypill__ticks i.near { background: rgba(255, 255, 255, 0.45); height: 14px; }
+  /* every other notch stands taller, so the scale reads at a glance */
+  .skypill__tick[data-i="1"],
+  .skypill__tick[data-i="3"],
+  .skypill__tick[data-i="5"] { height: 10px; opacity: 0.62; }
 
-  .skypill__label {
-    min-width: 62px;
-    padding-right: 6px;
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: rgba(255, 255, 255, 0.55);
-    white-space: nowrap;
-    transition: color 200ms ease;
+  .skypill__indicator {
+    position: absolute;
+    top: 4px; bottom: 4px;
+    width: 1.5px;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0.95;
+    transform: translateX(-0.75px);
+    pointer-events: none;
+    transition: left 260ms cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .skypill:hover .skypill__label { color: rgba(255, 255, 255, 0.8); }
 
   /* ---- entrance: everything rises in, one beat after another ---- */
   @media (prefers-reduced-motion: no-preference) {
@@ -365,15 +418,20 @@
   <footer class="sky" id="sky">
     <p class="sky__note"><strong>Get in touch</strong> for thoughtful product design, early ideas, <br />or just a hello. &copy; 2026 Hardik Malviya</p>
 
-    <div class="skypill" data-phase="live">
-      <button class="skypill__dial" type="button" id="sky-dial" aria-label="Sky preview, currently Live">
-        <svg id="sky-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+    <div class="skypill" id="sky-pill" data-icon="moonStars" data-state="live">
+      <button class="skypill__dial" type="button" id="sky-dial" data-state="live" aria-label="Sky preview, currently Live">
+        <span class="skypill__icon" data-icon="sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg></span>
+        <span class="skypill__icon" data-icon="moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z"/></svg></span>
+        <span class="skypill__icon" data-icon="moonStars" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 15.3A7.7 7.7 0 0 1 10.5 5.2 7.7 7.7 0 1 0 20.6 15.3Z"/><path d="M17.2 3.2l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z"/></svg></span>
+        <span class="skypill__icon" data-icon="sunHorizon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.6h18"/><path d="M6.8 17.6a5.2 5.2 0 0 1 10.4 0"/><path d="M12 4.2v2M5 7.4l1.4 1.4M19 7.4l-1.4 1.4"/></svg></span>
+        <span class="skypill__icon" data-icon="cloudSun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="7.8" r="2.8"/><path d="M8.6 2.8v1.2M8.6 11.6v1.2M3.6 7.8h1.2M12.4 7.8h1.2M5.1 4.3l.9.9M11.3 10.5l-.9-.9"/><path d="M11 19.6a3.1 3.1 0 0 1 .5-6.1 4.2 4.2 0 0 1 7.9 1.4 2.4 2.4 0 0 1-.4 4.7Z"/></svg></span>
+        <span class="skypill__spark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z"/></svg></span>
       </button>
       <div class="skypill__scale" id="sky-scale" role="slider" tabindex="0"
            aria-label="Sky time" aria-valuemin="0" aria-valuemax="8" aria-valuenow="8" aria-valuetext="Live">
-        <span class="skypill__ticks" id="sky-ticks"></span>
+        <div class="skypill__ticks" aria-hidden="true"><span class="skypill__tick" data-i="0"></span><span class="skypill__tick" data-i="1"></span><span class="skypill__tick" data-i="2"></span><span class="skypill__tick" data-i="3"></span><span class="skypill__tick" data-i="4"></span><span class="skypill__tick" data-i="5"></span><span class="skypill__tick" data-i="6"></span><span class="skypill__tick" data-i="7"></span></div>
+        <div class="skypill__indicator" id="sky-indicator" aria-hidden="true"></div>
       </div>
-      <span class="skypill__label" id="sky-label">Live</span>
     </div>
   </footer>
 
@@ -473,34 +531,24 @@
         return 7;                /* night     */
       }
 
-      var pill = document.querySelector('.skypill');
+      var pill = document.getElementById('sky-pill');
+      var dial = document.getElementById('sky-dial');
       var scale = document.getElementById('sky-scale');
-      var ticksWrap = document.getElementById('sky-ticks');
-      var label = document.getElementById('sky-label');
-      var iconEl = document.getElementById('sky-icon');
+      var indicator = document.getElementById('sky-indicator');
 
       var value = LIVE;                        /* current notch, 8 = Live */
-
-      /* build the ticks: one per phase plus the Live notch */
-      var markup = '';
-      for (var i = 0; i <= LIVE; i++) markup += '<i data-i="' + i + '"></i>';
-      ticksWrap.innerHTML = markup;
-      var ticks = ticksWrap.querySelectorAll('i');
 
       function paint() {
         var shown = value === LIVE ? liveIndex() : value;
         var phase = PHASES[shown];
         document.documentElement.style.setProperty('--sky', phase.sky);
-        pill.dataset.phase = value === LIVE ? 'live' : phase.key;
-        iconEl.innerHTML = ICONS[phase.icon];
-        label.textContent = value === LIVE ? 'Live' : phase.name;
+        pill.dataset.icon = phase.icon;
+        pill.dataset.state = value === LIVE ? 'live' : 'set';
+        dial.dataset.state = value === LIVE ? 'live' : 'set';
+        indicator.style.left = (value / LIVE * 100) + '%';
         scale.setAttribute('aria-valuenow', String(value));
         scale.setAttribute('aria-valuetext', value === LIVE ? 'Live' : phase.name);
-        document.getElementById('sky-dial').setAttribute('aria-label',
-          'Sky preview, currently ' + (value === LIVE ? 'Live' : phase.name));
-        for (var i = 0; i < ticks.length; i++) {
-          ticks[i].className = i === value ? 'on' : (Math.abs(i - value) === 1 ? 'near' : '');
-        }
+        dial.setAttribute('aria-label', 'Sky preview, currently ' + (value === LIVE ? 'Live' : phase.name));
       }
 
       function setValue(v) {
@@ -510,11 +558,9 @@
         paint();
       }
 
-      /* map a pointer x to the nearest notch */
       function valueFromX(x) {
-        var r = ticksWrap.getBoundingClientRect();
-        var t = (x - r.left) / Math.max(1, r.width);
-        return t * LIVE;
+        var r = scale.getBoundingClientRect();
+        return (x - r.left) / Math.max(1, r.width) * LIVE;
       }
 
       var dragging = false;
@@ -536,8 +582,8 @@
         if (e.key === 'End') { setValue(LIVE); e.preventDefault(); }
       });
 
-      /* the dial button steps forward, wrapping back to Live */
-      document.getElementById('sky-dial').addEventListener('click', function () {
+      /* the dial steps forward, wrapping back around to Live */
+      dial.addEventListener('click', function () {
         setValue(value >= LIVE ? 0 : value + 1);
       });
 
