@@ -9,6 +9,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 (function () {
@@ -158,7 +159,11 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
   /* ---- model --------------------------------------------------------- */
   var ready = false;
-  new GLTFLoader().load('models/visionpro.glb', function (gltf) {
+  var draco = new DRACOLoader();
+  draco.setDecoderPath('js/vendor/three/addons/libs/draco/');
+  var loader = new GLTFLoader();
+  loader.setDRACOLoader(draco);
+  loader.load('models/visionpro.glb', function (gltf) {
     var model = gltf.scene;
 
     /* centre the geometry so the pivot spins through the middle */
