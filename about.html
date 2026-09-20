@@ -136,40 +136,6 @@
   a.row:active { transform: translateX(2px) translateY(1px) scale(0.992); }
   .record__table.is-on:hover .row:not(:hover) { opacity: 0.45; }
 
-  /* mini-nav strip at the sheet's bottom edge */
-  .sheet__foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 26px var(--pad-page) 34px;
-  }
-
-  .sheet__who {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: var(--t-label);
-    color: var(--c-ink-muted);
-  }
-  .sheet__who .avatar { width: 26px; height: 26px; }
-
-  .sheet__links {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--t-label);
-  }
-  .sheet__links a { color: var(--c-ink-muted); transition: color 160ms ease; }
-  .sheet__links a:hover { color: var(--c-ink); }
-  .sheet__links .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--c-ink-ghost); }
-
-  .sheet__icons { display: flex; align-items: center; gap: 14px; }
-  .sheet__icons a { display: block; color: var(--c-ink-muted); transition: color 160ms ease; }
-  .sheet__icons a:hover { color: var(--c-ink); }
-  .sheet__icons svg { display: block; }
 
   /* ---- the sky ---- */
   .sky {
@@ -251,14 +217,12 @@
     .record__table.is-on .row:nth-child(4) { animation-delay: 240ms; }
     .record__table.is-on .row:nth-child(5) { animation-delay: 300ms; }
 
-    .sheet__foot { animation: rise 700ms var(--ease-out) 650ms both; }
     .sky__note   { animation: rise 900ms var(--ease-out) 250ms both; }
   }
 
   @media (max-width: 720px) {
     .row { grid-template-columns: 64px 1fr; }
     .row__role { grid-column: 2; text-align: left; margin-top: 2px; }
-    .sheet__links { display: none; }
     .statement .mark::after { height: 0.12em; }
   }
 </style>
@@ -354,26 +318,6 @@
       </div>
     </section>
 
-    <div class="sheet__foot">
-      <span class="sheet__who">
-        <span class="avatar"><img src="images/avatar.png" alt="" /></span>
-        Hardik Malviya
-      </span>
-      <nav class="sheet__links" aria-label="Pages">
-        <a href="index.html">Home</a>
-        <span class="dot" aria-hidden="true"></span>
-        <a href="index.html#work">Work</a>
-        <span class="dot" aria-hidden="true"></span>
-        <a href="files/Hardik-Malviya-Resume.pdf" target="_blank" rel="noopener">Resume</a>
-        <span class="dot" aria-hidden="true"></span>
-        <a href="https://cal.com/cole-hardik-design/discovery-call" target="_blank" rel="noopener noreferrer">Book a call</a>
-      </nav>
-      <span class="sheet__icons">
-        <a href="https://x.com/coleHardik" target="_blank" rel="noopener noreferrer" aria-label="X"><img class="pill__icon" src="images/icon-social-2.svg" alt="" width="15" height="15" /></a>
-        <a href="https://www.linkedin.com/in/hardik-malviya-3b27bb329/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><img class="pill__icon" src="images/icon-social-1.svg" alt="" width="15" height="15" /></a>
-        <a href="mailto:hardikmalviy@gmail.com" aria-label="Email"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7.5 L12 13 L20 7.5"/></svg></a>
-      </span>
-    </div>
   </div>
 
   <footer class="sky" id="sky">
