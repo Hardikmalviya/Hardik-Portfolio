@@ -151,7 +151,7 @@
   }
 
   .sky__note {
-    max-width: 640px;
+    max-width: 760px;            /* wide enough for the break to hold */
     text-align: center;
     font-size: clamp(17px, 2vw, 21px);
     line-height: 1.55;
@@ -221,6 +221,7 @@
   }
 
   @media (max-width: 720px) {
+    .sky__note br { display: none; }   /* let it wrap naturally on phones */
     .row { grid-template-columns: 64px 1fr; }
     .row__role { grid-column: 2; text-align: left; margin-top: 2px; }
     .statement .mark::after { height: 0.12em; }
@@ -321,7 +322,7 @@
   </div>
 
   <footer class="sky" id="sky">
-    <p class="sky__note"><strong>Get in touch</strong> for thoughtful product design, early ideas, or just a hello: it all starts with a message. &copy; 2026 Hardik Malviya &middot; sky shifts with the hour</p>
+    <p class="sky__note"><strong>Get in touch</strong> for thoughtful product design, early ideas, <br />or just a hello. &copy; 2026 Hardik Malviya</p>
 
     <div class="hourbar" title="sky shifts with the hour" aria-hidden="true">
       <svg id="hour-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></svg>
