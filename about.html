@@ -161,29 +161,70 @@
   .sky__note a { color: rgba(255, 255, 255, 0.8); transition: color 160ms ease; }
   .sky__note a:hover { color: #ffffff; }
 
-  /* bottom-left hour widget: an icon and one tick per hour of the day */
-  .hourbar {
+  /* bottom-left sky dial: drag through the day, or leave it on Live and
+     it follows the visitor's own clock */
+  .skypill {
     position: absolute;
     left: var(--pad-page);
     bottom: 26px;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 14px;
+    padding: 7px 8px 7px 10px;
     border-radius: var(--r-pill);
     background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     color: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    user-select: none;
+    transition: background 200ms ease, border-color 200ms ease;
   }
-  .hourbar svg { display: block; }
-  .hourbar__ticks { display: flex; align-items: center; gap: 5px; }
-  .hourbar__ticks i {
+  .skypill:hover { background: rgba(255, 255, 255, 0.11); border-color: rgba(255, 255, 255, 0.2); }
+
+  .skypill__dial {
+    display: grid;
+    place-items: center;
+    width: 24px; height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 300ms var(--ease-out), color 200ms ease;
+  }
+  .skypill__dial:hover { color: #fff; transform: rotate(-12deg); }
+  .skypill__dial svg { display: block; }
+
+  .skypill__scale {
+    position: relative;
+    padding: 8px 2px;              /* a taller grab area than it looks */
+    cursor: ew-resize;
+    outline: none;
+  }
+  .skypill__scale:focus-visible { box-shadow: 0 0 0 2px rgba(255,255,255,0.5); border-radius: 6px; }
+
+  .skypill__ticks { display: flex; align-items: center; gap: 5px; }
+  .skypill__ticks i {
     width: 2px;
-    height: 12px;
+    height: 11px;
     border-radius: 1px;
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.24);
+    transition: height 220ms var(--ease-out), background 220ms ease, opacity 220ms ease;
   }
-  .hourbar__ticks i.on { background: rgba(255, 255, 255, 0.85); height: 16px; }
+  .skypill__ticks i.on  { background: rgba(255, 255, 255, 0.9); height: 17px; }
+  .skypill__ticks i.near { background: rgba(255, 255, 255, 0.45); height: 14px; }
+
+  .skypill__label {
+    min-width: 62px;
+    padding-right: 6px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+    transition: color 200ms ease;
+  }
+  .skypill:hover .skypill__label { color: rgba(255, 255, 255, 0.8); }
 
   /* ---- entrance: everything rises in, one beat after another ---- */
   @media (prefers-reduced-motion: no-preference) {
@@ -324,9 +365,15 @@
   <footer class="sky" id="sky">
     <p class="sky__note"><strong>Get in touch</strong> for thoughtful product design, early ideas, <br />or just a hello. &copy; 2026 Hardik Malviya</p>
 
-    <div class="hourbar" title="sky shifts with the hour" aria-hidden="true">
-      <svg id="hour-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></svg>
-      <span class="hourbar__ticks" id="hour-ticks"></span>
+    <div class="skypill" data-phase="live">
+      <button class="skypill__dial" type="button" id="sky-dial" aria-label="Sky preview, currently Live">
+        <svg id="sky-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+      </button>
+      <div class="skypill__scale" id="sky-scale" role="slider" tabindex="0"
+           aria-label="Sky time" aria-valuemin="0" aria-valuemax="8" aria-valuenow="8" aria-valuetext="Live">
+        <span class="skypill__ticks" id="sky-ticks"></span>
+      </div>
+      <span class="skypill__label" id="sky-label">Live</span>
     </div>
   </footer>
 
@@ -390,38 +437,112 @@
         });
       });
 
-      /* ---- the sky follows the visitor's clock ---------------------- */
-      var SKIES = [
-        [0,  '#101322'],   /* deep night   */
-        [5,  '#232a4d'],   /* before dawn  */
-        [7,  '#5b6b9e'],   /* dawn         */
-        [9,  '#5d7fb9'],   /* morning      */
-        [12, '#4f7ab5'],   /* midday       */
-        [16, '#4a5f97'],   /* afternoon    */
-        [18, '#3c3f6e'],   /* dusk         */
-        [20, '#262b4a'],   /* evening      */
-        [23, '#101322']    /* night again  */
+      /* ---- the sky dial ---------------------------------------------
+         Eight phases plus Live. Drag the ticks, click them, or use the
+         arrow keys; land on the last notch and the sky goes back to
+         following the visitor's own clock. */
+      var PHASES = [
+        { key: 'predawn',   name: 'Pre-dawn',  sky: '#0e1120', icon: 'moonStars' },
+        { key: 'sunrise',   name: 'Sunrise',   sky: '#6b5f86', icon: 'sunHorizon' },
+        { key: 'morning',   name: 'Morning',   sky: '#5d7fb9', icon: 'cloudSun' },
+        { key: 'midday',    name: 'Midday',    sky: '#4f8ac4', icon: 'sun' },
+        { key: 'afternoon', name: 'Afternoon', sky: '#4a6ea8', icon: 'sun' },
+        { key: 'sunset',    name: 'Sunset',    sky: '#6a5580', icon: 'sunHorizon' },
+        { key: 'dusk',      name: 'Dusk',      sky: '#3c3f6e', icon: 'moon' },
+        { key: 'night',     name: 'Night',     sky: '#1a1e36', icon: 'moonStars' }
       ];
-      function skyFor(h) {
-        var c = SKIES[0][1];
-        for (var i = 0; i < SKIES.length; i++) if (h >= SKIES[i][0]) c = SKIES[i][1];
-        return c;
-      }
-      var ticksWrap = document.getElementById('hour-ticks');
-      var icon = document.getElementById('hour-icon');
-      function paintHour() {
+      var LIVE = PHASES.length;            /* index 8 */
+
+      var ICONS = {
+        sun: '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/>',
+        moon: '<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z"/>',
+        moonStars: '<path d="M20.5 15.2A7.7 7.7 0 0 1 10.4 5.1 7.7 7.7 0 1 0 20.5 15.2Z"/><path d="M17.2 3.4l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z"/>',
+        sunHorizon: '<path d="M3 17.5h18"/><path d="M6.5 17.5a5.5 5.5 0 0 1 11 0"/><path d="M12 4v2.2M4.9 7.1l1.5 1.5M19.1 7.1l-1.5 1.5"/>',
+        cloudSun: '<circle cx="8.4" cy="8" r="3"/><path d="M8.4 2.6v1.4M8.4 12v1.4M3 8h1.4M12.4 8h1.4M4.6 4.2l1 1M12.2 11.8l-1-1"/><path d="M11 19.4a3.2 3.2 0 0 1 .5-6.3 4.3 4.3 0 0 1 8.1 1.4 2.5 2.5 0 0 1-.4 4.9Z"/>'
+      };
+
+      function liveIndex() {
         var h = new Date().getHours();
-        document.documentElement.style.setProperty('--sky', skyFor(h));
-        var day = h >= 6 && h < 19;
-        icon.innerHTML = day
-          ? '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/>'
-          : '<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z"/>';
-        var html = '';
-        for (var i = 0; i < 12; i++) html += '<i' + (i === (h % 12) ? ' class="on"' : '') + '></i>';
-        ticksWrap.innerHTML = html;
+        if (h < 5)  return 0;    /* pre-dawn  */
+        if (h < 7)  return 1;    /* sunrise   */
+        if (h < 11) return 2;    /* morning   */
+        if (h < 14) return 3;    /* midday    */
+        if (h < 17) return 4;    /* afternoon */
+        if (h < 19) return 5;    /* sunset    */
+        if (h < 21) return 6;    /* dusk      */
+        return 7;                /* night     */
       }
-      paintHour();
-      setInterval(paintHour, 60000);
+
+      var pill = document.querySelector('.skypill');
+      var scale = document.getElementById('sky-scale');
+      var ticksWrap = document.getElementById('sky-ticks');
+      var label = document.getElementById('sky-label');
+      var iconEl = document.getElementById('sky-icon');
+
+      var value = LIVE;                        /* current notch, 8 = Live */
+
+      /* build the ticks: one per phase plus the Live notch */
+      var markup = '';
+      for (var i = 0; i <= LIVE; i++) markup += '<i data-i="' + i + '"></i>';
+      ticksWrap.innerHTML = markup;
+      var ticks = ticksWrap.querySelectorAll('i');
+
+      function paint() {
+        var shown = value === LIVE ? liveIndex() : value;
+        var phase = PHASES[shown];
+        document.documentElement.style.setProperty('--sky', phase.sky);
+        pill.dataset.phase = value === LIVE ? 'live' : phase.key;
+        iconEl.innerHTML = ICONS[phase.icon];
+        label.textContent = value === LIVE ? 'Live' : phase.name;
+        scale.setAttribute('aria-valuenow', String(value));
+        scale.setAttribute('aria-valuetext', value === LIVE ? 'Live' : phase.name);
+        document.getElementById('sky-dial').setAttribute('aria-label',
+          'Sky preview, currently ' + (value === LIVE ? 'Live' : phase.name));
+        for (var i = 0; i < ticks.length; i++) {
+          ticks[i].className = i === value ? 'on' : (Math.abs(i - value) === 1 ? 'near' : '');
+        }
+      }
+
+      function setValue(v) {
+        v = Math.max(0, Math.min(LIVE, Math.round(v)));
+        if (v === value) return;
+        value = v;
+        paint();
+      }
+
+      /* map a pointer x to the nearest notch */
+      function valueFromX(x) {
+        var r = ticksWrap.getBoundingClientRect();
+        var t = (x - r.left) / Math.max(1, r.width);
+        return t * LIVE;
+      }
+
+      var dragging = false;
+      scale.addEventListener('pointerdown', function (e) {
+        dragging = true;
+        scale.setPointerCapture(e.pointerId);
+        setValue(valueFromX(e.clientX));
+      });
+      scale.addEventListener('pointermove', function (e) {
+        if (dragging) setValue(valueFromX(e.clientX));
+      });
+      scale.addEventListener('pointerup', function () { dragging = false; });
+      scale.addEventListener('pointercancel', function () { dragging = false; });
+
+      scale.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { setValue(value + 1); e.preventDefault(); }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { setValue(value - 1); e.preventDefault(); }
+        if (e.key === 'Home') { setValue(0); e.preventDefault(); }
+        if (e.key === 'End') { setValue(LIVE); e.preventDefault(); }
+      });
+
+      /* the dial button steps forward, wrapping back to Live */
+      document.getElementById('sky-dial').addEventListener('click', function () {
+        setValue(value >= LIVE ? 0 : value + 1);
+      });
+
+      paint();
+      setInterval(function () { if (value === LIVE) paint(); }, 60000);
     })();
   </script>
 </body>
