@@ -13,7 +13,6 @@
 
 <link rel="stylesheet" href="styles.css" />
 <!-- start the heavy hero downloads immediately instead of after the scripts wake up -->
-<link rel="preload" href="images/visionpro-poster.webp" as="image" fetchpriority="high" />
 <link rel="preload" href="models/visionpro.glb" as="fetch" crossorigin />
 <link rel="modulepreload" href="js/vendor/three/three.module.min.js" />
 <link rel="modulepreload" href="js/vendor/three/three.core.min.js" />
@@ -75,9 +74,6 @@
          never intercepts clicks. -->
     <div class="hero__visor" aria-hidden="true">
       <span class="hero__visor-shadow"></span>
-      <!-- instant stand-in: a 15KB snapshot of the model in its resting
-           pose; the live 3D fades in over it when ready -->
-      <img class="hero__visor-img" src="images/visionpro-poster.webp" alt="" draggable="false" fetchpriority="high" />
     </div>
 
     <!-- Testimonials swap every 5s: the current one leaves, then the next
