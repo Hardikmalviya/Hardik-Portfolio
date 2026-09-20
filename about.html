@@ -112,6 +112,7 @@
 
   .row {
     font-weight: 400;            /* regular: the table should read quiet */
+    transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
     display: grid;
     grid-template-columns: 92px 1fr auto;
     gap: 16px;
@@ -130,7 +131,10 @@
   .row__name  { font-size: 16px; color: var(--c-ink); transition: color 160ms ease; }
   .row__role  { font-size: var(--t-label); color: var(--c-ink-muted); text-align: right; }
 
-  a.row:hover .row__name { color: var(--c-ink-muted); }
+  /* hover: the row steps forward 2px while its neighbours fall back */
+  .row:hover { transform: translateX(2px); }
+  a.row:active { transform: translateX(2px) translateY(1px) scale(0.992); }
+  .record__table.is-on:hover .row:not(:hover) { opacity: 0.45; }
 
   /* mini-nav strip at the sheet's bottom edge */
   .sheet__foot {
@@ -423,12 +427,21 @@
 
       /* teams / experiments toggle */
       var tabs = document.querySelectorAll('.record__tab');
+      function releaseRows() {
+        /* after the entrance plays, hand the transform back to :hover */
+        document.querySelectorAll('.record__table.is-on .row').forEach(function (r) {
+          r.addEventListener('animationend', function () { r.style.animation = 'none'; }, { once: true });
+        });
+      }
+      releaseRows();
       tabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
           tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t === tab)); });
           document.querySelectorAll('.record__table').forEach(function (tbl) {
             tbl.classList.toggle('is-on', tbl.id === 'tab-' + tab.dataset.tab);
+            tbl.querySelectorAll('.row').forEach(function (r) { r.style.animation = ''; });
           });
+          releaseRows();
         });
       });
 
