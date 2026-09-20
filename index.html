@@ -62,8 +62,8 @@
       I create clean, magnetic design <span>that makes products feel effortless to use.</span>
     </p>
 
-    <!-- 3D Vision Pro that follows the cursor (js/hero-3d.js). Decorative,
-         never intercepts clicks. -->
+    <!-- Folding iPhone Duo showing the portfolio (js/hero-duo.js).
+         Decorative, never intercepts clicks. -->
     <div class="hero__visor" aria-hidden="true">
       <span class="hero__visor-shadow"></span>
     </div>
@@ -266,7 +266,7 @@
     }
   }
   </script>
-  <script type="module" src="js/hero-3d.js"></script>
+  <script type="module" src="js/hero-duo.js"></script>
   <script src="js/theme.js" defer></script>
   <script src="js/sound.js" defer></script>
   <script src="js/lenis.min.js"></script>
@@ -277,7 +277,7 @@
       if (typeof Lenis !== 'function') return;
 
       var lenis = new Lenis({
-        lerp: 0.05,
+        lerp: 0.12,          // snappier: less glide than the old 0.05
         smoothWheel: true,
         syncTouch: false,      // phones and tablets keep native scrolling
         wheelMultiplier: 1,
