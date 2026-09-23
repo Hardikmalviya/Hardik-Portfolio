@@ -300,4 +300,19 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   document.addEventListener('visibilitychange', function () {
     if (started && !reduced) setRunning(!document.hidden);
   });
+
+  /* coming back via the browser's back button restores the page from cache
+     with its animation loop stopped; wake it up and repaint */
+  window.addEventListener('pageshow', function (e) {
+    if (!started) return;
+    resize();
+    if (reduced) { renderer.render(scene, camera); return; }
+    setRunning(true);
+    if (e.persisted) { last = performance.now(); renderer.render(scene, camera); }
+  });
+
+  /* a backgrounded tab can have its GPU context reclaimed; three.js rebuilds
+     its resources on restore, so the loop just needs to keep going */
+  canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); setRunning(false); });
+  canvas.addEventListener('webglcontextrestored', function () { resize(); setRunning(true); });
 })();
